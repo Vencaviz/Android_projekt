@@ -54,5 +54,16 @@
     <string name="message_loading">Načítání…</string>
     <string name="message_error_generic">Něco se pokazilo.</string>
     <string name="message_empty">Zatím tu nic není.</string>
+
+    <!-- Home -->
+    <string name="title_transactions">Transakce</string>
+    <string name="label_this_month">Tento měsíc: %1$s</string>
+
+    <!-- Exchange rate -->
+    <string name="label_buy">Nákup</string>
+    <string name="label_sell">Prodej</string>
+
+    <!-- Map -->
+    <string name="label_atm">Bankomat</string>
 </resources>
 

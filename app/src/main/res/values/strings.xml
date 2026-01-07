@@ -54,4 +54,15 @@
     <string name="message_loading">Loading…</string>
     <string name="message_error_generic">Something went wrong.</string>
     <string name="message_empty">Nothing here yet.</string>
+
+    <!-- Home -->
+    <string name="title_transactions">Transactions</string>
+    <string name="label_this_month">This month: %1$s</string>
+
+    <!-- Exchange rate -->
+    <string name="label_buy">Buy</string>
+    <string name="label_sell">Sell</string>
+
+    <!-- Map -->
+    <string name="label_atm">ATM</string>
 </resources>
