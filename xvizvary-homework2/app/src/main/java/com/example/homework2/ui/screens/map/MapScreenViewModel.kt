@@ -2,7 +2,6 @@ package com.example.homework2.ui.screens.map
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.room.util.copy
 import com.example.homework2.R
 import com.example.homework2.communication.CommunicationResult
 import com.example.homework2.communication.IAPIRemoteRepository

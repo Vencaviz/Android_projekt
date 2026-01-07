@@ -2,8 +2,8 @@ package com.example.homework2.auth
 
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import jakarta.inject.Inject
-import jakarta.inject.Singleton
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow

@@ -13,11 +13,15 @@ plugins {
 
 
 
-val properties = Properties()
-properties.load(project.rootProject.file("local.properties").reader())
-
-
-val server = properties.getProperty("server")
+val serverUrl: String = run {
+    val properties = Properties()
+    val localPropertiesFile = project.rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.reader().use { properties.load(it) }
+    }
+    // Must be quoted string for buildConfigField, e.g. "\"https://example.com/\""
+    properties.getProperty("server")
+} ?: "\"https://example.com/\""
 
 
 
@@ -27,12 +31,13 @@ android {
 
     defaultConfig {
         applicationId = "com.example.homework2"
-        minSdk = 27
+        minSdk = 28
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField(type = "String", name = "SERVER_URL", value = serverUrl)
     }
 
     buildTypes {
@@ -44,7 +49,7 @@ android {
             )
         }
         debug {
-            buildConfigField(type = "String", name = "SERVER_URL", value = server)
+            // defaultConfig already defines SERVER_URL
         }
     }
     compileOptions {
@@ -65,6 +70,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.datastore.preferences)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
@@ -79,6 +86,10 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.app.cash.turbine)
+    testImplementation(libs.okhttp.mockwebserver)
+    testImplementation(libs.androidx.room.testing)
 
     // Hilt
     implementation(libs.hilt.android)
@@ -104,6 +115,7 @@ dependencies {
     implementation(libs.googlemap.utils)
     implementation(libs.googlemap.widgets)
     implementation(libs.googlemap.compose.utils)
+    implementation(libs.play.services.location)
 
     implementation(libs.lifecycle)
     implementation(libs.room.ktx)
@@ -125,4 +137,10 @@ dependencies {
 
     // Důležité pro to, aby fungovalo .await() v Repository
     implementation(libs.kotlinx.coroutines.play.services)
+
+    // CameraX + ML Kit Text Recognition (receipts)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
+    implementation(libs.mlkit.text.recognition)
 }
