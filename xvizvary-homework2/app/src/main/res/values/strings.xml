@@ -1,7 +1,0 @@
-<resources>
-    <string name="app_name">homework2</string>
-    <string name="back">Back</string>
-    <string name="no_internet_connection">no internet\n</string>
-    <string name="failed_to_load_data">failed to load data</string>
-    <string name="exception">unknown exception</string>
-</resources>
