@@ -1,0 +1,58 @@
+<resources>
+    <string name="app_name">SmartBudget</string>
+    <string name="google_maps_api_key">YOUR_MAPS_API_KEY</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Domů</string>
+    <string name="nav_search">Hledat</string>
+    <string name="nav_limits">Limity</string>
+    <string name="nav_profile">Profil</string>
+
+    <!-- Screens -->
+    <string name="screen_sign_in">Přihlášení</string>
+    <string name="screen_sign_up">Registrace</string>
+    <string name="screen_overview">Přehled</string>
+    <string name="screen_search">Hledat</string>
+    <string name="screen_limits">Limity</string>
+    <string name="screen_limit_detail">Detail limitu</string>
+    <string name="screen_exchange_rate">Kurzovní lístek</string>
+    <string name="screen_interest_rate">Úrokové sazby</string>
+    <string name="screen_profile">Profil</string>
+
+    <!-- Actions -->
+    <string name="action_back">Zpět</string>
+    <string name="action_add">Přidat</string>
+    <string name="action_add_transaction">Přidat transakci</string>
+    <string name="action_scan_receipt">Načíst účtenku</string>
+    <string name="action_sign_in">Přihlásit se</string>
+    <string name="action_sign_up">Zaregistrovat se</string>
+    <string name="action_forgot_password">Zapomněli jste heslo?</string>
+
+    <!-- Form labels -->
+    <string name="label_email">E-mail</string>
+    <string name="label_password">Heslo</string>
+    <string name="label_name">Jméno</string>
+    <string name="label_phone">Telefon</string>
+    <string name="label_date">Datum</string>
+    <string name="label_amount">Částka</string>
+    <string name="label_paid_received">Zaplaceno / přijato</string>
+    <string name="label_category">Kategorie</string>
+
+    <!-- Search -->
+    <string name="title_what_to_find">Co potřebujete najít?</string>
+    <string name="search_for_atms">Bankomaty</string>
+    <string name="search_for_interest_rate">Úrokové sazby</string>
+    <string name="search_for_exchange_rate">Kurzy měn</string>
+    <string name="hint_search_place">Banka</string>
+
+    <!-- Profile / settings -->
+    <string name="profile_language">Jazyk</string>
+    <string name="language_english">Angličtina</string>
+    <string name="language_czech">Čeština</string>
+
+    <!-- Generic -->
+    <string name="message_loading">Načítání…</string>
+    <string name="message_error_generic">Něco se pokazilo.</string>
+    <string name="message_empty">Zatím tu nic není.</string>
+</resources>
+

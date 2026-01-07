@@ -1,3 +1,57 @@
 <resources>
-    <string name="app_name">Project</string>
+    <string name="app_name">SmartBudget</string>
+    <string name="google_maps_api_key">YOUR_MAPS_API_KEY</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_limits">Limits</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Screens -->
+    <string name="screen_sign_in">Sign in</string>
+    <string name="screen_sign_up">Sign up</string>
+    <string name="screen_overview">Overview</string>
+    <string name="screen_search">Search</string>
+    <string name="screen_limits">Limits</string>
+    <string name="screen_limit_detail">Limits detail</string>
+    <string name="screen_exchange_rate">Exchange rate</string>
+    <string name="screen_interest_rate">Interest rate</string>
+    <string name="screen_profile">Profile</string>
+
+    <!-- Actions -->
+    <string name="action_back">Back</string>
+    <string name="action_add">Add</string>
+    <string name="action_add_transaction">Add transaction</string>
+    <string name="action_scan_receipt">Scan receipt</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_up">Sign up</string>
+    <string name="action_forgot_password">Forgot your password?</string>
+
+    <!-- Form labels -->
+    <string name="label_email">E-mail</string>
+    <string name="label_password">Password</string>
+    <string name="label_name">Name</string>
+    <string name="label_phone">Phone</string>
+    <string name="label_date">Date</string>
+    <string name="label_amount">Amount</string>
+    <string name="label_paid_received">Paid / received</string>
+    <string name="label_category">Category</string>
+
+    <!-- Search -->
+    <string name="title_what_to_find">What do you need to find?</string>
+    <string name="search_for_atms">ATM</string>
+    <string name="search_for_interest_rate">Interest rate</string>
+    <string name="search_for_exchange_rate">Exchange rate</string>
+    <string name="hint_search_place">Bank</string>
+
+    <!-- Profile / settings -->
+    <string name="profile_language">Language</string>
+    <string name="language_english">English</string>
+    <string name="language_czech">Czech</string>
+
+    <!-- Generic -->
+    <string name="message_loading">Loading…</string>
+    <string name="message_error_generic">Something went wrong.</string>
+    <string name="message_empty">Nothing here yet.</string>
 </resources>
