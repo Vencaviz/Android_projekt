@@ -58,6 +58,7 @@ dependencies {
 
     // DI
     implementation(libs.dagger.hilt.android)
+    implementation(libs.androidx.adapters)
     kapt(libs.dagger.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
@@ -86,6 +87,7 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.compose)
+    implementation(libs.androidx.camera.core)
 
     // Images
     implementation(libs.coil.compose)

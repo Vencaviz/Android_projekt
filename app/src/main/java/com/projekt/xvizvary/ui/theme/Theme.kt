@@ -23,6 +23,8 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = SmartTextPrimary
 )
 
+
+
 private val LightColorScheme = lightColorScheme(
     primary = SmartOrange,
     secondary = SmartOrangeDark,

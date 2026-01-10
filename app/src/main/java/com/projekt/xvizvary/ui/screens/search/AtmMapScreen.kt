@@ -53,7 +53,7 @@ fun AtmMapScreen() {
                 .height(220.dp),
             cameraPositionState = cameraPositionState
         ) {
-            Marker(position = brno, title = stringResource(R.string.label_atm))
+            Marker( title = stringResource(R.string.label_atm))
         }
 
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
