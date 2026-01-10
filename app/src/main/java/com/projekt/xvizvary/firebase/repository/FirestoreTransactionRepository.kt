@@ -121,6 +121,7 @@ class FirestoreTransactionRepository @Inject constructor(
 
     /**
      * Get sum of transactions by type and date range
+     * Note: Filters in-memory to avoid requiring Firestore composite indexes
      */
     suspend fun getSumByTypeAndDateRange(
         userId: String,
@@ -130,17 +131,65 @@ class FirestoreTransactionRepository @Inject constructor(
     ): Double {
         return try {
             val snapshot = getUserTransactionsCollection(userId)
-                .whereEqualTo(FirestoreConstants.FIELD_TYPE, type)
-                .whereGreaterThanOrEqualTo(FirestoreConstants.FIELD_DATE, startDate)
-                .whereLessThanOrEqualTo(FirestoreConstants.FIELD_DATE, endDate)
                 .get()
                 .await()
 
-            snapshot.documents.sumOf { doc ->
-                doc.getDouble(FirestoreConstants.FIELD_AMOUNT) ?: 0.0
+            snapshot.documents
+                .mapNotNull { doc -> doc.toObject(FirestoreTransaction::class.java) }
+                .filter { tx ->
+                    tx.type == type && tx.date in startDate..endDate
+                }
+                .sumOf { it.amount }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0.0
+        }
+    }
+
+    /**
+     * Get sum of transactions by category, type and date range
+     */
+    suspend fun getSumByCategoryAndDateRange(
+        userId: String,
+        categoryId: String,
+        type: String,
+        startDate: Long,
+        endDate: Long
+    ): Double {
+        return try {
+            val snapshot = getUserTransactionsCollection(userId)
+                .get()
+                .await()
+
+            snapshot.documents
+                .mapNotNull { doc -> doc.toObject(FirestoreTransaction::class.java) }
+                .filter { tx ->
+                    tx.categoryId == categoryId && 
+                    tx.type == type && 
+                    tx.date in startDate..endDate
+                }
+                .sumOf { it.amount }
+        } catch (e: Exception) {
+            e.printStackTrace()
+            0.0
+        }
+    }
+
+    /**
+     * Get all transactions once (not as Flow) for calculations
+     */
+    suspend fun getTransactionsOnce(userId: String): List<FirestoreTransaction> {
+        return try {
+            val snapshot = getUserTransactionsCollection(userId)
+                .get()
+                .await()
+
+            snapshot.documents.mapNotNull { doc ->
+                doc.toObject(FirestoreTransaction::class.java)
             }
         } catch (e: Exception) {
-            0.0
+            e.printStackTrace()
+            emptyList()
         }
     }
 }

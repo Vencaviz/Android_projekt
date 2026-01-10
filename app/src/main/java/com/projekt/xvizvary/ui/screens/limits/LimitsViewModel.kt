@@ -74,14 +74,14 @@ class LimitsViewModel @Inject constructor(
                     val limitsWithSpent = limits.mapNotNull { limit ->
                         val category = categories[limit.categoryId] ?: return@mapNotNull null
                         
-                        val spent = transactionRepository.getSumByTypeAndDateRange(
+                        // Calculate spent amount for this specific category
+                        val spent = transactionRepository.getSumByCategoryAndDateRange(
                             userId = userId,
+                            categoryId = limit.categoryId,
                             type = "EXPENSE",
                             startDate = startOfMonth,
                             endDate = endOfMonth
                         )
-                        // Note: In real app, you'd filter by categoryId as well
-                        // For now, we calculate based on all expenses
 
                         LimitWithSpentDisplay(
                             limit = limit,
