@@ -51,8 +51,8 @@ class LimitDetailViewModel @Inject constructor(
     val events: SharedFlow<LimitDetailEvent> = _events.asSharedFlow()
 
     // Get limitId from navigation - "0" means new limit
-    private val limitIdParam: Long = savedStateHandle.get<Long>("limitId") ?: 0
-    private val limitId: String? = if (limitIdParam > 0) limitIdParam.toString() else null
+    private val limitIdParam: String = savedStateHandle.get<String>("limitId") ?: "0"
+    private val limitId: String? = if (limitIdParam != "0") limitIdParam else null
 
     init {
         loadData()

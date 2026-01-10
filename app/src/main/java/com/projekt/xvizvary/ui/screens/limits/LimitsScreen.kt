@@ -39,7 +39,7 @@ import com.projekt.xvizvary.util.CurrencyUtils
 
 @Composable
 fun LimitsScreen(
-    onLimitClick: (Long) -> Unit,
+    onLimitClick: (String) -> Unit,
     onAddLimit: () -> Unit,
     viewModel: LimitsViewModel = hiltViewModel()
 ) {

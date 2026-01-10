@@ -89,6 +89,9 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.compose)
     implementation(libs.androidx.camera.core)
+    
+    // Guava for ListenableFuture (required by CameraX)
+    implementation("com.google.guava:guava:32.1.3-android")
 
     // Images
     implementation(libs.coil.compose)

@@ -136,14 +136,14 @@ fun SmartBudgetRoot() {
                         navController.navigate(Destination.LimitDetail.createRoute(limitId)) 
                     },
                     onAddLimit = { 
-                        navController.navigate(Destination.LimitDetail.createRoute(0)) 
+                        navController.navigate(Destination.LimitDetail.createRoute("0")) 
                     }
                 )
             }
 
             composable(
                 route = Destination.LimitDetail.route,
-                arguments = listOf(navArgument("limitId") { type = NavType.LongType })
+                arguments = listOf(navArgument("limitId") { type = NavType.StringType })
             ) {
                 LimitDetailScreen(
                     onLimitSaved = { navController.navigateUp() },
