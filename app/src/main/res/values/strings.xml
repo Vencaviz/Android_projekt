@@ -94,6 +94,19 @@
     <string name="hint_no_account">Don\'t have an account?</string>
     <string name="hint_have_account">Already have an account?</string>
 
+    <!-- Receipt Scan -->
+    <string name="message_receipt_saved">Receipt saved and transaction created</string>
+    <string name="hint_point_at_receipt">Point camera at receipt</string>
+    <string name="label_detected_text">Detected text</string>
+    <string name="action_capture">Capture</string>
+    <string name="title_confirm_receipt">Confirm receipt data</string>
+    <string name="label_store_name">Store name</string>
+    <string name="label_raw_text">Recognized text</string>
+    <string name="action_rescan">Rescan</string>
+    <string name="permission_camera_rationale">Camera permission is required to scan receipts</string>
+    <string name="action_grant_permission">Grant permission</string>
+    <string name="message_requesting_permission">Requesting camera permission…</string>
+
     <!-- Exchange rate -->
     <string name="label_buy">Buy</string>
     <string name="label_sell">Sell</string>

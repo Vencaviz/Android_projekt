@@ -93,6 +93,9 @@ dependencies {
     // Images
     implementation(libs.coil.compose)
 
+    // Permissions
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
 

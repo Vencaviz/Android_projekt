@@ -160,7 +160,12 @@ fun SmartBudgetRoot() {
                     }
                 )
             }
-            composable(Destination.ReceiptScan.route) { ReceiptScanScreen() }
+            composable(Destination.ReceiptScan.route) { 
+                ReceiptScanScreen(
+                    onReceiptSaved = { navController.navigateUp() },
+                    onCancel = { navController.navigateUp() }
+                )
+            }
         }
     }
 }

@@ -94,6 +94,19 @@
     <string name="hint_no_account">Nemáte účet?</string>
     <string name="hint_have_account">Již máte účet?</string>
 
+    <!-- Receipt Scan -->
+    <string name="message_receipt_saved">Účtenka uložena a transakce vytvořena</string>
+    <string name="hint_point_at_receipt">Namiřte kameru na účtenku</string>
+    <string name="label_detected_text">Rozpoznaný text</string>
+    <string name="action_capture">Vyfotit</string>
+    <string name="title_confirm_receipt">Potvrďte údaje z účtenky</string>
+    <string name="label_store_name">Název obchodu</string>
+    <string name="label_raw_text">Rozpoznaný text</string>
+    <string name="action_rescan">Znovu skenovat</string>
+    <string name="permission_camera_rationale">Pro skenování účtenek je potřeba oprávnění k fotoaparátu</string>
+    <string name="action_grant_permission">Povolit</string>
+    <string name="message_requesting_permission">Žádost o oprávnění fotoaparátu…</string>
+
     <!-- Exchange rate -->
     <string name="label_buy">Nákup</string>
     <string name="label_sell">Prodej</string>
