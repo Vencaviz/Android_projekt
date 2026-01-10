@@ -6,24 +6,22 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "receipts",
+    tableName = "limits",
     foreignKeys = [
         ForeignKey(
-            entity = Transaction::class,
+            entity = Category::class,
             parentColumns = ["id"],
-            childColumns = ["transactionId"],
+            childColumns = ["categoryId"],
             onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index(value = ["transactionId"])]
+    indices = [Index(value = ["categoryId"])]
 )
-data class Receipt(
+data class Limit(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val storeName: String,
-    val totalAmount: Double,
-    val date: Long, // timestamp in milliseconds
-    val rawText: String, // Original OCR text
-    val transactionId: Long? = null, // Linked transaction if created
+    val categoryId: Long,
+    val limitAmount: Double,
+    val periodMonths: Int = 1, // 1 = monthly, 3 = quarterly, 12 = yearly
     val createdAt: Long = System.currentTimeMillis()
 )

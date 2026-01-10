@@ -6,24 +6,25 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "receipts",
+    tableName = "transactions",
     foreignKeys = [
         ForeignKey(
-            entity = Transaction::class,
+            entity = Category::class,
             parentColumns = ["id"],
-            childColumns = ["transactionId"],
-            onDelete = ForeignKey.CASCADE
+            childColumns = ["categoryId"],
+            onDelete = ForeignKey.SET_NULL
         )
     ],
-    indices = [Index(value = ["transactionId"])]
+    indices = [Index(value = ["categoryId"])]
 )
-data class Receipt(
+data class Transaction(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val storeName: String,
-    val totalAmount: Double,
+    val name: String,
+    val amount: Double,
+    val type: TransactionType,
+    val categoryId: Long? = null,
     val date: Long, // timestamp in milliseconds
-    val rawText: String, // Original OCR text
-    val transactionId: Long? = null, // Linked transaction if created
+    val note: String? = null,
     val createdAt: Long = System.currentTimeMillis()
 )
