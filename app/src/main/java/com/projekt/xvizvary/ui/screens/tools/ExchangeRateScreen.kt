@@ -48,19 +48,10 @@ fun ExchangeRateScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
-                Text(
-                    text = stringResource(R.string.screen_exchange_rate),
-                    style = MaterialTheme.typography.titleLarge
-                )
-                if (uiState.date.isNotEmpty()) {
-                    Text(
-                        text = uiState.date,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
+            Text(
+                text = stringResource(R.string.screen_exchange_rate),
+                style = MaterialTheme.typography.titleLarge
+            )
             IconButton(onClick = { viewModel.refresh() }) {
                 Icon(
                     imageVector = Icons.Default.Refresh,

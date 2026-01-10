@@ -1,9 +1,9 @@
 package com.projekt.xvizvary.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import com.projekt.xvizvary.network.ExchangeRateApiService
-import com.projekt.xvizvary.network.repository.ExchangeRateRepository
-import com.projekt.xvizvary.network.repository.ExchangeRateRepositoryImpl
+import com.projekt.xvizvary.communication.ExchangeRateAPI
+import com.projekt.xvizvary.communication.ExchangeRateRemoteRepositoryImpl
+import com.projekt.xvizvary.communication.IExchangeRateRemoteRepository
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -55,7 +55,7 @@ object NetworkModule {
         val contentType = "application/json".toMediaType()
 
         return Retrofit.Builder()
-            .baseUrl(ExchangeRateApiService.BASE_URL)
+            .baseUrl(ExchangeRateAPI.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
@@ -63,8 +63,8 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideExchangeRateApiService(retrofit: Retrofit): ExchangeRateApiService {
-        return retrofit.create(ExchangeRateApiService::class.java)
+    fun provideExchangeRateAPI(retrofit: Retrofit): ExchangeRateAPI {
+        return retrofit.create(ExchangeRateAPI::class.java)
     }
 }
 
@@ -74,7 +74,7 @@ abstract class NetworkBindingsModule {
 
     @Binds
     @Singleton
-    abstract fun bindExchangeRateRepository(
-        impl: ExchangeRateRepositoryImpl
-    ): ExchangeRateRepository
+    abstract fun bindExchangeRateRemoteRepository(
+        impl: ExchangeRateRemoteRepositoryImpl
+    ): IExchangeRateRemoteRepository
 }

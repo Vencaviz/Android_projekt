@@ -1,4 +1,4 @@
-package com.example.homework2.communication
+package com.projekt.xvizvary.communication
 
 data class CommunicationError(
     val code: Int,
