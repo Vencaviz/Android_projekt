@@ -115,5 +115,10 @@
 
     <!-- Map -->
     <string name="label_atm">Bankomat</string>
+    <string name="hint_search_atm">Hledat bankomat nebo banku</string>
+    <string name="filter_all">Vše</string>
+    <string name="label_atm_results">Nalezené bankomaty</string>
+    <string name="label_deposit">Vklad</string>
+    <string name="label_open_24h">Otevřeno 24/7</string>
 </resources>
 

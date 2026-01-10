@@ -115,4 +115,9 @@
 
     <!-- Map -->
     <string name="label_atm">ATM</string>
+    <string name="hint_search_atm">Search ATM or bank</string>
+    <string name="filter_all">All</string>
+    <string name="label_atm_results">ATMs found</string>
+    <string name="label_deposit">Deposit</string>
+    <string name="label_open_24h">Open 24/7</string>
 </resources>
