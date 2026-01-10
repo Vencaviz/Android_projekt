@@ -62,6 +62,8 @@
     <!-- Exchange rate -->
     <string name="label_buy">Nákup</string>
     <string name="label_sell">Prodej</string>
+    <string name="label_per_unit">za %1$s</string>
+    <string name="action_refresh">Obnovit</string>
 
     <!-- Map -->
     <string name="label_atm">Bankomat</string>
