@@ -1,10 +1,10 @@
 package com.projekt.xvizvary
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.Lifecycle
@@ -17,7 +17,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private val viewModel: MainActivityViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,9 +27,15 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.language.collect { lang ->
-                    AppCompatDelegate.setApplicationLocales(
-                        LocaleListCompat.forLanguageTags(lang.languageTag)
-                    )
+                    val currentLocale = AppCompatDelegate.getApplicationLocales()
+                        .toLanguageTags()
+                    
+                    // Only update if different to avoid recreation loop
+                    if (currentLocale != lang.languageTag) {
+                        AppCompatDelegate.setApplicationLocales(
+                            LocaleListCompat.forLanguageTags(lang.languageTag)
+                        )
+                    }
                 }
             }
         }
