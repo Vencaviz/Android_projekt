@@ -96,19 +96,17 @@ dependencies {
     // Permissions
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
-    //Firebase
-    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
-
-
-    // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
+    // Firebase BoM (Bill of Materials)
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
 
     // Firebase Authentication
     implementation("com.google.firebase:firebase-auth-ktx")
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
-
+    
     // Firebase Firestore
     implementation("com.google.firebase:firebase-firestore-ktx")
+    
+    // Google Play Services Auth
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
 
 
     testImplementation(libs.junit)
