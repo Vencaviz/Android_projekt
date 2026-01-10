@@ -2,10 +2,11 @@ package com.projekt.xvizvary.ui.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.projekt.xvizvary.database.model.TransactionType
-import com.projekt.xvizvary.database.model.TransactionWithCategory
-import com.projekt.xvizvary.database.repository.CategoryRepository
-import com.projekt.xvizvary.database.repository.TransactionRepository
+import com.projekt.xvizvary.auth.repository.UserRepository
+import com.projekt.xvizvary.firebase.model.FirestoreCategory
+import com.projekt.xvizvary.firebase.model.FirestoreTransaction
+import com.projekt.xvizvary.firebase.repository.FirestoreCategoryRepository
+import com.projekt.xvizvary.firebase.repository.FirestoreTransactionRepository
 import com.projekt.xvizvary.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,9 +15,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class TransactionWithCategoryDisplay(
+    val transaction: FirestoreTransaction,
+    val category: FirestoreCategory?
+)
+
 data class HomeUiState(
     val isLoading: Boolean = true,
-    val transactions: List<TransactionWithCategory> = emptyList(),
+    val transactions: List<TransactionWithCategoryDisplay> = emptyList(),
     val monthlyIncome: Double = 0.0,
     val monthlyExpense: Double = 0.0,
     val monthlyBalance: Double = 0.0,
@@ -25,43 +31,52 @@ data class HomeUiState(
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val transactionRepository: TransactionRepository,
-    private val categoryRepository: CategoryRepository
+    private val userRepository: UserRepository,
+    private val transactionRepository: FirestoreTransactionRepository,
+    private val categoryRepository: FirestoreCategoryRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
+    private var categories: Map<String, FirestoreCategory> = emptyMap()
+
     init {
-        initializeCategories()
         loadData()
     }
 
-    private fun initializeCategories() {
-        viewModelScope.launch {
-            categoryRepository.initializeDefaultCategories()
-        }
-    }
-
     private fun loadData() {
+        val userId = userRepository.getCurrentUserId() ?: return
         val startOfMonth = DateUtils.getStartOfMonth()
         val endOfMonth = DateUtils.getEndOfMonth()
 
         viewModelScope.launch {
+            // Load categories first
+            categories = categoryRepository.getCategoriesOnce(userId)
+                .associateBy { it.id }
+
             // Load transactions for current month
-            transactionRepository.getTransactionsByDateRangeWithCategory(startOfMonth, endOfMonth)
+            transactionRepository.getTransactionsByDateRange(userId, startOfMonth, endOfMonth)
                 .collect { transactions ->
+                    // Map transactions with their categories
+                    val transactionsWithCategory = transactions.map { tx ->
+                        TransactionWithCategoryDisplay(
+                            transaction = tx,
+                            category = tx.categoryId?.let { categories[it] }
+                        )
+                    }
+
                     // Calculate monthly totals
                     val income = transactionRepository.getSumByTypeAndDateRange(
-                        TransactionType.INCOME, startOfMonth, endOfMonth
+                        userId, "INCOME", startOfMonth, endOfMonth
                     )
                     val expense = transactionRepository.getSumByTypeAndDateRange(
-                        TransactionType.EXPENSE, startOfMonth, endOfMonth
+                        userId, "EXPENSE", startOfMonth, endOfMonth
                     )
 
                     _uiState.value = HomeUiState(
                         isLoading = false,
-                        transactions = transactions,
+                        transactions = transactionsWithCategory,
                         monthlyIncome = income,
                         monthlyExpense = expense,
                         monthlyBalance = income - expense,
@@ -71,9 +86,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun deleteTransaction(transaction: TransactionWithCategory) {
+    fun deleteTransaction(transaction: TransactionWithCategoryDisplay) {
+        val userId = userRepository.getCurrentUserId() ?: return
         viewModelScope.launch {
-            transactionRepository.deleteTransaction(transaction.transaction)
+            transactionRepository.deleteTransaction(userId, transaction.transaction.id)
         }
     }
 

@@ -38,8 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.projekt.xvizvary.R
-import com.projekt.xvizvary.database.model.TransactionType
-import com.projekt.xvizvary.database.model.TransactionWithCategory
+import com.projekt.xvizvary.firebase.model.FirestoreTransaction
 import com.projekt.xvizvary.util.CurrencyUtils
 import com.projekt.xvizvary.util.DateUtils
 
@@ -198,10 +197,10 @@ fun HomeScreen(
                     items(
                         items = uiState.transactions,
                         key = { it.transaction.id }
-                    ) { transactionWithCategory ->
+                    ) { txWithCategory ->
                         TransactionCard(
-                            transactionWithCategory = transactionWithCategory,
-                            onDelete = { viewModel.deleteTransaction(transactionWithCategory) }
+                            transactionWithCategory = txWithCategory,
+                            onDelete = { viewModel.deleteTransaction(txWithCategory) }
                         )
                     }
                 }
@@ -212,12 +211,12 @@ fun HomeScreen(
 
 @Composable
 private fun TransactionCard(
-    transactionWithCategory: TransactionWithCategory,
+    transactionWithCategory: TransactionWithCategoryDisplay,
     onDelete: () -> Unit
 ) {
     val transaction = transactionWithCategory.transaction
     val category = transactionWithCategory.category
-    val isIncome = transaction.type == TransactionType.INCOME
+    val isIncome = transaction.type == "INCOME"
 
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(

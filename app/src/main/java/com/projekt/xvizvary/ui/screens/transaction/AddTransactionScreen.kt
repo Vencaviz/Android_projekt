@@ -39,7 +39,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.projekt.xvizvary.R
-import com.projekt.xvizvary.database.model.TransactionType
 import com.projekt.xvizvary.util.DateUtils
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -90,15 +89,15 @@ fun AddTransactionScreen(
 
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
             SegmentedButton(
-                selected = uiState.type == TransactionType.EXPENSE,
-                onClick = { viewModel.onTypeChange(TransactionType.EXPENSE) },
+                selected = uiState.type == TransactionTypeSelection.EXPENSE,
+                onClick = { viewModel.onTypeChange(TransactionTypeSelection.EXPENSE) },
                 shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2)
             ) {
                 Text(text = stringResource(R.string.label_expense))
             }
             SegmentedButton(
-                selected = uiState.type == TransactionType.INCOME,
-                onClick = { viewModel.onTypeChange(TransactionType.INCOME) },
+                selected = uiState.type == TransactionTypeSelection.INCOME,
+                onClick = { viewModel.onTypeChange(TransactionTypeSelection.INCOME) },
                 shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2)
             ) {
                 Text(text = stringResource(R.string.label_income))

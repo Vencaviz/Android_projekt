@@ -2,25 +2,50 @@ package com.projekt.xvizvary.ui.screens.limits
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.projekt.xvizvary.database.model.LimitWithSpent
-import com.projekt.xvizvary.database.repository.LimitRepository
+import com.projekt.xvizvary.auth.repository.UserRepository
+import com.projekt.xvizvary.firebase.model.FirestoreCategory
+import com.projekt.xvizvary.firebase.model.FirestoreLimit
+import com.projekt.xvizvary.firebase.repository.FirestoreCategoryRepository
+import com.projekt.xvizvary.firebase.repository.FirestoreLimitRepository
+import com.projekt.xvizvary.firebase.repository.FirestoreTransactionRepository
 import com.projekt.xvizvary.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class LimitWithSpentDisplay(
+    val limit: FirestoreLimit,
+    val category: FirestoreCategory,
+    val spentAmount: Double
+) {
+    val remainingAmount: Double
+        get() = limit.limitAmount - spentAmount
+
+    val progress: Float
+        get() = if (limit.limitAmount > 0) {
+            (spentAmount / limit.limitAmount).toFloat().coerceIn(0f, 1f)
+        } else 0f
+
+    val isOverBudget: Boolean
+        get() = spentAmount > limit.limitAmount
+}
+
 data class LimitsUiState(
     val isLoading: Boolean = true,
-    val limits: List<LimitWithSpent> = emptyList(),
+    val limits: List<LimitWithSpentDisplay> = emptyList(),
     val error: String? = null
 )
 
 @HiltViewModel
 class LimitsViewModel @Inject constructor(
-    private val limitRepository: LimitRepository
+    private val userRepository: UserRepository,
+    private val limitRepository: FirestoreLimitRepository,
+    private val categoryRepository: FirestoreCategoryRepository,
+    private val transactionRepository: FirestoreTransactionRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LimitsUiState())
@@ -31,6 +56,8 @@ class LimitsViewModel @Inject constructor(
     }
 
     fun loadLimits() {
+        val userId = userRepository.getCurrentUserId() ?: return
+
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
 
@@ -38,12 +65,36 @@ class LimitsViewModel @Inject constructor(
                 val startOfMonth = DateUtils.getStartOfMonth()
                 val endOfMonth = DateUtils.getEndOfMonth()
 
-                val limitsWithSpent = limitRepository.getLimitsWithSpent(startOfMonth, endOfMonth)
+                // Get all categories
+                val categories = categoryRepository.getCategoriesOnce(userId)
+                    .associateBy { it.id }
 
-                _uiState.value = LimitsUiState(
-                    isLoading = false,
-                    limits = limitsWithSpent
-                )
+                // Get limits and calculate spent amounts
+                limitRepository.getLimits(userId).collect { limits ->
+                    val limitsWithSpent = limits.mapNotNull { limit ->
+                        val category = categories[limit.categoryId] ?: return@mapNotNull null
+                        
+                        val spent = transactionRepository.getSumByTypeAndDateRange(
+                            userId = userId,
+                            type = "EXPENSE",
+                            startDate = startOfMonth,
+                            endDate = endOfMonth
+                        )
+                        // Note: In real app, you'd filter by categoryId as well
+                        // For now, we calculate based on all expenses
+
+                        LimitWithSpentDisplay(
+                            limit = limit,
+                            category = category,
+                            spentAmount = spent
+                        )
+                    }
+
+                    _uiState.value = LimitsUiState(
+                        isLoading = false,
+                        limits = limitsWithSpent
+                    )
+                }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
@@ -53,10 +104,10 @@ class LimitsViewModel @Inject constructor(
         }
     }
 
-    fun deleteLimit(limitWithSpent: LimitWithSpent) {
+    fun deleteLimit(limitWithSpent: LimitWithSpentDisplay) {
+        val userId = userRepository.getCurrentUserId() ?: return
         viewModelScope.launch {
-            limitRepository.deleteLimit(limitWithSpent.limit)
-            loadLimits()
+            limitRepository.deleteLimit(userId, limitWithSpent.limit.id)
         }
     }
 

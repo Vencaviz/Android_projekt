@@ -2,11 +2,9 @@ package com.projekt.xvizvary.ui.screens.receipt
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.projekt.xvizvary.database.model.Receipt
-import com.projekt.xvizvary.database.model.Transaction
-import com.projekt.xvizvary.database.model.TransactionType
-import com.projekt.xvizvary.database.repository.ReceiptRepository
-import com.projekt.xvizvary.database.repository.TransactionRepository
+import com.projekt.xvizvary.auth.repository.UserRepository
+import com.projekt.xvizvary.firebase.model.FirestoreTransaction
+import com.projekt.xvizvary.firebase.repository.FirestoreTransactionRepository
 import com.projekt.xvizvary.mlkit.ParsedReceipt
 import com.projekt.xvizvary.mlkit.ReceiptParser
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,8 +42,8 @@ sealed class ReceiptScanEvent {
 @HiltViewModel
 class ReceiptScanViewModel @Inject constructor(
     private val receiptParser: ReceiptParser,
-    private val receiptRepository: ReceiptRepository,
-    private val transactionRepository: TransactionRepository
+    private val userRepository: UserRepository,
+    private val transactionRepository: FirestoreTransactionRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ReceiptScanUiState())
@@ -115,6 +113,14 @@ class ReceiptScanViewModel @Inject constructor(
      * Save the receipt and create a transaction
      */
     fun saveReceipt() {
+        val userId = userRepository.getCurrentUserId()
+        if (userId == null) {
+            viewModelScope.launch {
+                _events.emit(ReceiptScanEvent.Error("User not logged in"))
+            }
+            return
+        }
+
         val state = _uiState.value
         
         val amount = state.editableAmount.toDoubleOrNull()
@@ -132,28 +138,17 @@ class ReceiptScanViewModel @Inject constructor(
             )
 
             try {
-                // Create transaction
-                val transaction = Transaction(
+                // Create transaction in Firestore
+                val transaction = FirestoreTransaction(
                     name = storeName,
                     amount = amount,
-                    type = TransactionType.EXPENSE,
-                    categoryId = null, // Could be categorized later
+                    type = "EXPENSE",
+                    categoryId = null,
                     date = System.currentTimeMillis(),
-                    note = "Scanned from receipt"
+                    note = "Scanned from receipt: ${state.parsedReceipt?.rawText?.take(100) ?: ""}"
                 )
                 
-                val transactionId = transactionRepository.insertTransaction(transaction)
-
-                // Save receipt with link to transaction
-                val receipt = Receipt(
-                    storeName = storeName,
-                    totalAmount = amount,
-                    date = System.currentTimeMillis(),
-                    rawText = state.parsedReceipt?.rawText ?: "",
-                    transactionId = transactionId
-                )
-                
-                receiptRepository.insertReceipt(receipt)
+                transactionRepository.addTransaction(userId, transaction)
 
                 _events.emit(ReceiptScanEvent.ReceiptSaved)
             } catch (e: Exception) {

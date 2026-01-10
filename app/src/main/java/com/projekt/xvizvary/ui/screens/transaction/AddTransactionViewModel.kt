@@ -2,11 +2,11 @@ package com.projekt.xvizvary.ui.screens.transaction
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.projekt.xvizvary.database.model.Category
-import com.projekt.xvizvary.database.model.Transaction
-import com.projekt.xvizvary.database.model.TransactionType
-import com.projekt.xvizvary.database.repository.CategoryRepository
-import com.projekt.xvizvary.database.repository.TransactionRepository
+import com.projekt.xvizvary.auth.repository.UserRepository
+import com.projekt.xvizvary.firebase.model.FirestoreCategory
+import com.projekt.xvizvary.firebase.model.FirestoreTransaction
+import com.projekt.xvizvary.firebase.repository.FirestoreCategoryRepository
+import com.projekt.xvizvary.firebase.repository.FirestoreTransactionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,14 +17,19 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+enum class TransactionTypeSelection {
+    INCOME,
+    EXPENSE
+}
+
 data class AddTransactionUiState(
     val name: String = "",
     val amount: String = "",
-    val type: TransactionType = TransactionType.EXPENSE,
-    val selectedCategoryId: Long? = null,
+    val type: TransactionTypeSelection = TransactionTypeSelection.EXPENSE,
+    val selectedCategoryId: String? = null,
     val date: Long = System.currentTimeMillis(),
     val note: String = "",
-    val categories: List<Category> = emptyList(),
+    val categories: List<FirestoreCategory> = emptyList(),
     val isLoading: Boolean = false,
     val nameError: String? = null,
     val amountError: String? = null
@@ -37,8 +42,9 @@ sealed class AddTransactionEvent {
 
 @HiltViewModel
 class AddTransactionViewModel @Inject constructor(
-    private val transactionRepository: TransactionRepository,
-    private val categoryRepository: CategoryRepository
+    private val userRepository: UserRepository,
+    private val transactionRepository: FirestoreTransactionRepository,
+    private val categoryRepository: FirestoreCategoryRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddTransactionUiState())
@@ -52,8 +58,9 @@ class AddTransactionViewModel @Inject constructor(
     }
 
     private fun loadCategories() {
+        val userId = userRepository.getCurrentUserId() ?: return
         viewModelScope.launch {
-            categoryRepository.getAllCategories().collect { categories ->
+            categoryRepository.getCategories(userId).collect { categories ->
                 _uiState.value = _uiState.value.copy(categories = categories)
             }
         }
@@ -70,11 +77,11 @@ class AddTransactionViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(amount = filtered, amountError = null)
     }
 
-    fun onTypeChange(type: TransactionType) {
+    fun onTypeChange(type: TransactionTypeSelection) {
         _uiState.value = _uiState.value.copy(type = type)
     }
 
-    fun onCategoryChange(categoryId: Long?) {
+    fun onCategoryChange(categoryId: String?) {
         _uiState.value = _uiState.value.copy(selectedCategoryId = categoryId)
     }
 
@@ -87,6 +94,14 @@ class AddTransactionViewModel @Inject constructor(
     }
 
     fun saveTransaction() {
+        val userId = userRepository.getCurrentUserId()
+        if (userId == null) {
+            viewModelScope.launch {
+                _events.emit(AddTransactionEvent.Error("User not logged in"))
+            }
+            return
+        }
+
         val state = _uiState.value
 
         // Validation
@@ -109,16 +124,16 @@ class AddTransactionViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true)
 
             try {
-                val transaction = Transaction(
+                val transaction = FirestoreTransaction(
                     name = state.name.trim(),
                     amount = amountValue!!,
-                    type = state.type,
+                    type = state.type.name,
                     categoryId = state.selectedCategoryId,
                     date = state.date,
                     note = state.note.takeIf { it.isNotBlank() }
                 )
 
-                transactionRepository.insertTransaction(transaction)
+                transactionRepository.addTransaction(userId, transaction)
                 _events.emit(AddTransactionEvent.TransactionSaved)
             } catch (e: Exception) {
                 _events.emit(AddTransactionEvent.Error(e.message ?: "Unknown error"))

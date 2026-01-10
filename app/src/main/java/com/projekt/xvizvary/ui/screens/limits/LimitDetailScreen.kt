@@ -109,23 +109,24 @@ fun LimitDetailScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 categoriesToShow.forEach { category ->
+                    val isSelected = uiState.selectedCategoryId == category.id
                     FilterChip(
-                        selected = uiState.selectedCategoryId == category.id,
+                        selected = isSelected,
                         onClick = {
                             viewModel.onCategoryChange(
-                                if (uiState.selectedCategoryId == category.id) null 
+                                if (isSelected) null 
                                 else category.id
                             )
                         },
                         label = { Text(category.name) },
                         border = BorderStroke(
                             1.dp,
-                            if (uiState.selectedCategoryId == category.id)
+                            if (isSelected)
                                 MaterialTheme.colorScheme.primary
                             else
                                 MaterialTheme.colorScheme.outline
                         ),
-                        enabled = !uiState.isEditMode || category.id == uiState.selectedCategoryId
+                        enabled = !uiState.isEditMode || isSelected
                     )
                 }
             }

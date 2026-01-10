@@ -104,12 +104,11 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
 
     // Firebase Authentication
-    implementation("com.google.firebase:firebase-auth-ktx:22.2.0")
+    implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 
-    // Firebase BoM (Bill of Materials)
-    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
-    implementation("com.google.firebase:firebase-auth")
+    // Firebase Firestore
+    implementation("com.google.firebase:firebase-firestore-ktx")
 
 
     testImplementation(libs.junit)

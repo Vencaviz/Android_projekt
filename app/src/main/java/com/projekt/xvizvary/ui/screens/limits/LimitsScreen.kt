@@ -35,7 +35,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.projekt.xvizvary.R
-import com.projekt.xvizvary.database.model.LimitWithSpent
 import com.projekt.xvizvary.util.CurrencyUtils
 
 @Composable
@@ -142,7 +141,7 @@ fun LimitsScreen(
 
 @Composable
 private fun LimitCard(
-    limitWithSpent: LimitWithSpent,
+    limitWithSpent: LimitWithSpentDisplay,
     onClick: () -> Unit,
     onDelete: () -> Unit
 ) {
