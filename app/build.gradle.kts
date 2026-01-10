@@ -118,6 +118,8 @@ dependencies {
     testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.turbine)
     testImplementation(libs.dagger.hilt.android.testing)
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.mockito:mockito-core:5.8.0")
     kaptTest(libs.dagger.hilt.compiler)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
