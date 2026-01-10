@@ -109,13 +109,13 @@ fun LimitDetailScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 categoriesToShow.forEach { category ->
-                    val isSelected = uiState.selectedCategoryId == category.id
+                    val isSelected = uiState.selectedCategoryId == category.firestoreId
                     FilterChip(
                         selected = isSelected,
                         onClick = {
                             viewModel.onCategoryChange(
                                 if (isSelected) null 
-                                else category.id
+                                else category.firestoreId
                             )
                         },
                         label = { Text(category.name) },

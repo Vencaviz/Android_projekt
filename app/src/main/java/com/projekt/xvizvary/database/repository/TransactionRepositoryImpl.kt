@@ -3,7 +3,6 @@ package com.projekt.xvizvary.database.repository
 import com.projekt.xvizvary.database.TransactionDao
 import com.projekt.xvizvary.database.model.Transaction
 import com.projekt.xvizvary.database.model.TransactionType
-import com.projekt.xvizvary.database.model.TransactionWithCategory
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -13,39 +12,43 @@ class TransactionRepositoryImpl @Inject constructor(
     private val transactionDao: TransactionDao
 ) : TransactionRepository {
 
-    override fun getAllTransactions(): Flow<List<Transaction>> {
-        return transactionDao.getAll()
+    override fun getTransactionsByUser(userId: String): Flow<List<Transaction>> {
+        return transactionDao.getAllByUser(userId)
     }
 
-    override fun getAllTransactionsWithCategory(): Flow<List<TransactionWithCategory>> {
-        return transactionDao.getAllWithCategory()
+    override suspend fun getTransactionsByUserOnce(userId: String): List<Transaction> {
+        return transactionDao.getAllByUserOnce(userId)
     }
 
-    override fun getTransactionsByDateRange(startDate: Long, endDate: Long): Flow<List<Transaction>> {
-        return transactionDao.getByDateRange(startDate, endDate)
-    }
-
-    override fun getTransactionsByDateRangeWithCategory(
+    override fun getTransactionsByUserAndDateRange(
+        userId: String,
         startDate: Long,
         endDate: Long
-    ): Flow<List<TransactionWithCategory>> {
-        return transactionDao.getByDateRangeWithCategory(startDate, endDate)
+    ): Flow<List<Transaction>> {
+        return transactionDao.getByUserAndDateRange(userId, startDate, endDate)
     }
 
-    override fun getTransactionsByCategory(categoryId: Long): Flow<List<Transaction>> {
-        return transactionDao.getByCategory(categoryId)
+    override fun getTransactionsByUserAndCategory(
+        userId: String,
+        categoryId: String
+    ): Flow<List<Transaction>> {
+        return transactionDao.getByUserAndCategory(userId, categoryId)
     }
 
     override suspend fun getTransactionById(id: Long): Transaction? {
         return transactionDao.getById(id)
     }
 
-    override suspend fun getTransactionByIdWithCategory(id: Long): TransactionWithCategory? {
-        return transactionDao.getByIdWithCategory(id)
+    override suspend fun getTransactionByFirestoreId(firestoreId: String): Transaction? {
+        return transactionDao.getByFirestoreId(firestoreId)
     }
 
     override suspend fun insertTransaction(transaction: Transaction): Long {
         return transactionDao.insert(transaction)
+    }
+
+    override suspend fun insertTransactions(transactions: List<Transaction>) {
+        transactionDao.insertAll(transactions)
     }
 
     override suspend fun updateTransaction(transaction: Transaction) {
@@ -56,23 +59,29 @@ class TransactionRepositoryImpl @Inject constructor(
         transactionDao.delete(transaction)
     }
 
-    override suspend fun getSumByTypeAndDateRange(
+    override suspend fun deleteTransactionByFirestoreId(firestoreId: String) {
+        transactionDao.deleteByFirestoreId(firestoreId)
+    }
+
+    override suspend fun getSumByUserTypeAndDateRange(
+        userId: String,
         type: TransactionType,
         startDate: Long,
         endDate: Long
     ): Double {
-        return transactionDao.getSumByTypeAndDateRange(type, startDate, endDate) ?: 0.0
+        return transactionDao.getSumByUserTypeAndDateRange(userId, type, startDate, endDate) ?: 0.0
     }
 
-    override suspend fun getSpentByCategoryAndDateRange(
-        categoryId: Long,
+    override suspend fun getSpentByUserCategoryAndDateRange(
+        userId: String,
+        categoryId: String,
         startDate: Long,
         endDate: Long
     ): Double {
-        return transactionDao.getSpentByCategoryAndDateRange(categoryId, startDate, endDate) ?: 0.0
+        return transactionDao.getSpentByUserCategoryAndDateRange(userId, categoryId, startDate, endDate) ?: 0.0
     }
 
-    override suspend fun deleteAllTransactions() {
-        transactionDao.deleteAll()
+    override suspend fun deleteAllByUser(userId: String) {
+        transactionDao.deleteAllByUser(userId)
     }
 }

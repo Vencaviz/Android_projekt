@@ -3,7 +3,6 @@ package com.projekt.xvizvary.database.repository
 import com.projekt.xvizvary.database.TransactionDao
 import com.projekt.xvizvary.database.model.Transaction
 import com.projekt.xvizvary.database.model.TransactionType
-import com.projekt.xvizvary.database.model.TransactionWithCategory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -20,8 +19,12 @@ class TransactionRepositoryTest {
     private lateinit var transactionDao: TransactionDao
     private lateinit var repository: TransactionRepositoryImpl
 
+    private val testUserId = "testUser123"
+
     private val testTransaction = Transaction(
         id = 1,
+        firestoreId = "tx1",
+        userId = testUserId,
         name = "Test Transaction",
         amount = 100.0,
         type = TransactionType.EXPENSE,
@@ -36,11 +39,11 @@ class TransactionRepositoryTest {
     }
 
     @Test
-    fun `getAllTransactions returns flow from dao`() = runTest {
+    fun `getTransactionsByUser returns flow from dao`() = runTest {
         val transactions = listOf(testTransaction)
-        whenever(transactionDao.getAll()).thenReturn(flowOf(transactions))
+        whenever(transactionDao.getAllByUser(testUserId)).thenReturn(flowOf(transactions))
 
-        val result = repository.getAllTransactions().first()
+        val result = repository.getTransactionsByUser(testUserId).first()
 
         assertEquals(1, result.size)
         assertEquals("Test Transaction", result[0].name)
@@ -83,11 +86,12 @@ class TransactionRepositoryTest {
     }
 
     @Test
-    fun `getSumByTypeAndDateRange returns sum from dao`() = runTest {
-        whenever(transactionDao.getSumByTypeAndDateRange(any(), any(), any()))
+    fun `getSumByUserTypeAndDateRange returns sum from dao`() = runTest {
+        whenever(transactionDao.getSumByUserTypeAndDateRange(any(), any(), any(), any()))
             .thenReturn(500.0)
 
-        val result = repository.getSumByTypeAndDateRange(
+        val result = repository.getSumByUserTypeAndDateRange(
+            testUserId,
             TransactionType.EXPENSE,
             0L,
             System.currentTimeMillis()
@@ -97,11 +101,12 @@ class TransactionRepositoryTest {
     }
 
     @Test
-    fun `getSumByTypeAndDateRange returns zero when dao returns null`() = runTest {
-        whenever(transactionDao.getSumByTypeAndDateRange(any(), any(), any()))
+    fun `getSumByUserTypeAndDateRange returns zero when dao returns null`() = runTest {
+        whenever(transactionDao.getSumByUserTypeAndDateRange(any(), any(), any(), any()))
             .thenReturn(null)
 
-        val result = repository.getSumByTypeAndDateRange(
+        val result = repository.getSumByUserTypeAndDateRange(
+            testUserId,
             TransactionType.EXPENSE,
             0L,
             System.currentTimeMillis()

@@ -15,7 +15,7 @@ import com.projekt.xvizvary.database.model.Transaction
         Limit::class,
         Receipt::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = true
 )
 @TypeConverters(Converters::class)

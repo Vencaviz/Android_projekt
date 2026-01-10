@@ -144,16 +144,16 @@ fun AddTransactionScreen(
         ) {
             uiState.categories.forEach { category ->
                 FilterChip(
-                    selected = uiState.selectedCategoryId == category.id,
+                    selected = uiState.selectedCategoryId == category.firestoreId,
                     onClick = {
                         viewModel.onCategoryChange(
-                            if (uiState.selectedCategoryId == category.id) null else category.id
+                            if (uiState.selectedCategoryId == category.firestoreId) null else category.firestoreId
                         )
                     },
                     label = { Text(category.name) },
                     border = BorderStroke(
                         1.dp,
-                        if (uiState.selectedCategoryId == category.id)
+                        if (uiState.selectedCategoryId == category.firestoreId)
                             MaterialTheme.colorScheme.primary
                         else
                             MaterialTheme.colorScheme.outline

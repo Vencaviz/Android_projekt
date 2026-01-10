@@ -38,7 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.projekt.xvizvary.R
-import com.projekt.xvizvary.firebase.model.FirestoreTransaction
+import com.projekt.xvizvary.database.model.TransactionType
 import com.projekt.xvizvary.util.CurrencyUtils
 import com.projekt.xvizvary.util.DateUtils
 
@@ -196,7 +196,7 @@ fun HomeScreen(
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     items(
                         items = uiState.transactions,
-                        key = { it.transaction.id }
+                        key = { it.transaction.firestoreId.ifEmpty { it.transaction.id.toString() } }
                     ) { txWithCategory ->
                         TransactionCard(
                             transactionWithCategory = txWithCategory,
@@ -216,7 +216,7 @@ private fun TransactionCard(
 ) {
     val transaction = transactionWithCategory.transaction
     val category = transactionWithCategory.category
-    val isIncome = transaction.type == "INCOME"
+    val isIncome = transaction.type == TransactionType.INCOME
 
     Card(modifier = Modifier.fillMaxWidth()) {
         Row(

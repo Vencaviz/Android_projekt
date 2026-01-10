@@ -78,44 +78,44 @@ class FirestoreTransactionRepository @Inject constructor(
     /**
      * Add a new transaction
      */
-    suspend fun addTransaction(userId: String, transaction: FirestoreTransaction): Result<String> {
+    suspend fun addTransaction(userId: String, transaction: FirestoreTransaction): String? {
         return try {
             val docRef = getUserTransactionsCollection(userId).document()
             val transactionWithId = transaction.copy(id = docRef.id)
             docRef.set(transactionWithId).await()
-            Result.success(docRef.id)
+            docRef.id
         } catch (e: Exception) {
-            Result.failure(e)
+            null
         }
     }
 
     /**
      * Update a transaction
      */
-    suspend fun updateTransaction(userId: String, transaction: FirestoreTransaction): Result<Unit> {
+    suspend fun updateTransaction(userId: String, transaction: FirestoreTransaction): Boolean {
         return try {
             getUserTransactionsCollection(userId)
                 .document(transaction.id)
                 .set(transaction)
                 .await()
-            Result.success(Unit)
+            true
         } catch (e: Exception) {
-            Result.failure(e)
+            false
         }
     }
 
     /**
      * Delete a transaction
      */
-    suspend fun deleteTransaction(userId: String, transactionId: String): Result<Unit> {
+    suspend fun deleteTransaction(userId: String, transactionId: String): Boolean {
         return try {
             getUserTransactionsCollection(userId)
                 .document(transactionId)
                 .delete()
                 .await()
-            Result.success(Unit)
+            true
         } catch (e: Exception) {
-            Result.failure(e)
+            false
         }
     }
 

@@ -3,10 +3,11 @@ package com.projekt.xvizvary.ui.screens.receipt
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.projekt.xvizvary.auth.repository.UserRepository
-import com.projekt.xvizvary.firebase.model.FirestoreTransaction
-import com.projekt.xvizvary.firebase.repository.FirestoreTransactionRepository
+import com.projekt.xvizvary.database.model.Transaction
+import com.projekt.xvizvary.database.model.TransactionType
 import com.projekt.xvizvary.mlkit.ParsedReceipt
 import com.projekt.xvizvary.mlkit.ReceiptParser
+import com.projekt.xvizvary.sync.SyncRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,7 +44,7 @@ sealed class ReceiptScanEvent {
 class ReceiptScanViewModel @Inject constructor(
     private val receiptParser: ReceiptParser,
     private val userRepository: UserRepository,
-    private val transactionRepository: FirestoreTransactionRepository
+    private val syncRepository: SyncRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ReceiptScanUiState())
@@ -138,17 +139,18 @@ class ReceiptScanViewModel @Inject constructor(
             )
 
             try {
-                // Create transaction in Firestore
-                val transaction = FirestoreTransaction(
+                // Create transaction via SyncRepository (saves to both local and cloud)
+                val transaction = Transaction(
+                    userId = userId,
                     name = storeName,
                     amount = amount,
-                    type = "EXPENSE",
+                    type = TransactionType.EXPENSE,
                     categoryId = null,
                     date = System.currentTimeMillis(),
                     note = "Scanned from receipt: ${state.parsedReceipt?.rawText?.take(100) ?: ""}"
                 )
                 
-                transactionRepository.addTransaction(userId, transaction)
+                syncRepository.addTransaction(userId, transaction)
 
                 _events.emit(ReceiptScanEvent.ReceiptSaved)
             } catch (e: Exception) {

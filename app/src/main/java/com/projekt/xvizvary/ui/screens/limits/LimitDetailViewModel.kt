@@ -4,10 +4,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.projekt.xvizvary.auth.repository.UserRepository
-import com.projekt.xvizvary.firebase.model.FirestoreCategory
-import com.projekt.xvizvary.firebase.model.FirestoreLimit
-import com.projekt.xvizvary.firebase.repository.FirestoreCategoryRepository
-import com.projekt.xvizvary.firebase.repository.FirestoreLimitRepository
+import com.projekt.xvizvary.database.model.Category
+import com.projekt.xvizvary.database.model.Limit
+import com.projekt.xvizvary.database.repository.CategoryRepository
+import com.projekt.xvizvary.database.repository.LimitRepository
+import com.projekt.xvizvary.sync.SyncRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,8 +26,8 @@ data class LimitDetailUiState(
     val limitId: String? = null,
     val selectedCategoryId: String? = null,
     val limitAmount: String = "",
-    val categories: List<FirestoreCategory> = emptyList(),
-    val availableCategories: List<FirestoreCategory> = emptyList(),
+    val categories: List<Category> = emptyList(),
+    val availableCategories: List<Category> = emptyList(),
     val categoryError: String? = null,
     val amountError: String? = null
 )
@@ -40,8 +41,9 @@ sealed class LimitDetailEvent {
 class LimitDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val userRepository: UserRepository,
-    private val limitRepository: FirestoreLimitRepository,
-    private val categoryRepository: FirestoreCategoryRepository
+    private val limitRepository: LimitRepository,
+    private val categoryRepository: CategoryRepository,
+    private val syncRepository: SyncRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LimitDetailUiState())
@@ -64,11 +66,12 @@ class LimitDetailViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
-            val allCategories = categoryRepository.getCategoriesOnce(userId)
+            // Load categories from local DB
+            val allCategories = categoryRepository.getCategoriesByUserOnce(userId)
 
             if (limitId != null) {
-                // Edit mode - load existing limit
-                val limit = limitRepository.getLimitById(userId, limitId)
+                // Edit mode - load existing limit from local DB
+                val limit = limitRepository.getLimitByFirestoreId(limitId)
                 if (limit != null) {
                     _uiState.value = LimitDetailUiState(
                         isLoading = false,
@@ -81,10 +84,10 @@ class LimitDetailViewModel @Inject constructor(
                     )
                 }
             } else {
-                // Add mode - find categories without limits
-                val limits = limitRepository.getLimits(userId).first()
+                // Add mode - find categories without limits from local DB
+                val limits = limitRepository.getLimitsByUser(userId).first()
                 val categoriesWithLimits = limits.map { it.categoryId }.toSet()
-                val availableCategories = allCategories.filter { it.id !in categoriesWithLimits }
+                val availableCategories = allCategories.filter { it.firestoreId !in categoriesWithLimits }
 
                 _uiState.value = LimitDetailUiState(
                     isLoading = false,
@@ -142,23 +145,22 @@ class LimitDetailViewModel @Inject constructor(
             try {
                 if (state.isEditMode && state.limitId != null) {
                     // Update existing limit
-                    val existingLimit = limitRepository.getLimitById(userId, state.limitId)
+                    val existingLimit = limitRepository.getLimitByFirestoreId(state.limitId)
                     if (existingLimit != null) {
-                        limitRepository.updateLimit(
-                            userId,
-                            existingLimit.copy(
-                                categoryId = state.selectedCategoryId!!,
-                                limitAmount = amountValue!!
-                            )
+                        val updatedLimit = existingLimit.copy(
+                            categoryId = state.selectedCategoryId!!,
+                            limitAmount = amountValue!!
                         )
+                        syncRepository.updateLimit(userId, updatedLimit)
                     }
                 } else {
-                    // Create new limit
-                    val limit = FirestoreLimit(
+                    // Create new limit via SyncRepository
+                    val limit = Limit(
+                        userId = userId,
                         categoryId = state.selectedCategoryId!!,
                         limitAmount = amountValue!!
                     )
-                    limitRepository.addLimit(userId, limit)
+                    syncRepository.addLimit(userId, limit)
                 }
 
                 _events.emit(LimitDetailEvent.LimitSaved)

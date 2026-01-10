@@ -46,6 +46,23 @@ class FirestoreLimitRepository @Inject constructor(
     }
 
     /**
+     * Get all limits once (not as Flow) for sync
+     */
+    suspend fun getLimitsOnce(userId: String): List<FirestoreLimit> {
+        return try {
+            val snapshot = getUserLimitsCollection(userId)
+                .get()
+                .await()
+
+            snapshot.documents.mapNotNull { doc ->
+                doc.toObject(FirestoreLimit::class.java)
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
+    /**
      * Get limit by ID
      */
     suspend fun getLimitById(userId: String, limitId: String): FirestoreLimit? {
@@ -63,44 +80,44 @@ class FirestoreLimitRepository @Inject constructor(
     /**
      * Add a new limit
      */
-    suspend fun addLimit(userId: String, limit: FirestoreLimit): Result<String> {
+    suspend fun addLimit(userId: String, limit: FirestoreLimit): String? {
         return try {
             val docRef = getUserLimitsCollection(userId).document()
             val limitWithId = limit.copy(id = docRef.id)
             docRef.set(limitWithId).await()
-            Result.success(docRef.id)
+            docRef.id
         } catch (e: Exception) {
-            Result.failure(e)
+            null
         }
     }
 
     /**
      * Update a limit
      */
-    suspend fun updateLimit(userId: String, limit: FirestoreLimit): Result<Unit> {
+    suspend fun updateLimit(userId: String, limit: FirestoreLimit): Boolean {
         return try {
             getUserLimitsCollection(userId)
                 .document(limit.id)
                 .set(limit)
                 .await()
-            Result.success(Unit)
+            true
         } catch (e: Exception) {
-            Result.failure(e)
+            false
         }
     }
 
     /**
      * Delete a limit
      */
-    suspend fun deleteLimit(userId: String, limitId: String): Result<Unit> {
+    suspend fun deleteLimit(userId: String, limitId: String): Boolean {
         return try {
             getUserLimitsCollection(userId)
                 .document(limitId)
                 .delete()
                 .await()
-            Result.success(Unit)
+            true
         } catch (e: Exception) {
-            Result.failure(e)
+            false
         }
     }
 }

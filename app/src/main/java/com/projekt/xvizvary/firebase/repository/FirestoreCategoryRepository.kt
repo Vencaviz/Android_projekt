@@ -82,14 +82,14 @@ class FirestoreCategoryRepository @Inject constructor(
     /**
      * Add a new category
      */
-    suspend fun addCategory(userId: String, category: FirestoreCategory): Result<String> {
+    suspend fun addCategory(userId: String, category: FirestoreCategory): String? {
         return try {
             val docRef = getUserCategoriesCollection(userId).document()
             val categoryWithId = category.copy(id = docRef.id)
             docRef.set(categoryWithId).await()
-            Result.success(docRef.id)
+            docRef.id
         } catch (e: Exception) {
-            Result.failure(e)
+            null
         }
     }
 

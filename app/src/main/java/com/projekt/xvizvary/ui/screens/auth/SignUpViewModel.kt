@@ -2,6 +2,7 @@ package com.projekt.xvizvary.ui.screens.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.projekt.xvizvary.auth.Manager.SessionManager
 import com.projekt.xvizvary.auth.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -18,6 +19,7 @@ data class SignUpUiState(
     val password: String = "",
     val confirmPassword: String = "",
     val isLoading: Boolean = false,
+    val isSyncing: Boolean = false,
     val emailError: String? = null,
     val passwordError: String? = null,
     val confirmPasswordError: String? = null
@@ -30,7 +32,8 @@ sealed class SignUpEvent {
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val registerUseCase: RegisterUseCase
+    private val registerUseCase: RegisterUseCase,
+    private val sessionManager: SessionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SignUpUiState())
@@ -81,16 +84,19 @@ class SignUpViewModel @Inject constructor(
 
             result.fold(
                 onSuccess = {
+                    // Sync data from cloud after successful registration
+                    _uiState.value = _uiState.value.copy(isLoading = false, isSyncing = true)
+                    sessionManager.syncAfterLogin()
+                    _uiState.value = _uiState.value.copy(isSyncing = false)
                     _events.emit(SignUpEvent.SignUpSuccess)
                 },
                 onFailure = { exception ->
+                    _uiState.value = _uiState.value.copy(isLoading = false)
                     _events.emit(SignUpEvent.SignUpError(
                         exception.message ?: "Registration failed"
                     ))
                 }
             )
-
-            _uiState.value = _uiState.value.copy(isLoading = false)
         }
     }
 }

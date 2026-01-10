@@ -11,20 +11,24 @@ class CategoryRepositoryImpl @Inject constructor(
     private val categoryDao: CategoryDao
 ) : CategoryRepository {
 
-    override fun getAllCategories(): Flow<List<Category>> {
-        return categoryDao.getAll()
+    override fun getCategoriesByUser(userId: String): Flow<List<Category>> {
+        return categoryDao.getAllByUser(userId)
     }
 
-    override suspend fun getAllCategoriesOnce(): List<Category> {
-        return categoryDao.getAllOnce()
+    override suspend fun getCategoriesByUserOnce(userId: String): List<Category> {
+        return categoryDao.getAllByUserOnce(userId)
     }
 
     override suspend fun getCategoryById(id: Long): Category? {
         return categoryDao.getById(id)
     }
 
-    override suspend fun getCategoryByName(name: String): Category? {
-        return categoryDao.getByName(name)
+    override suspend fun getCategoryByFirestoreId(firestoreId: String): Category? {
+        return categoryDao.getByFirestoreId(firestoreId)
+    }
+
+    override suspend fun getCategoryByUserAndName(userId: String, name: String): Category? {
+        return categoryDao.getByUserAndName(userId, name)
     }
 
     override suspend fun insertCategory(category: Category): Long {
@@ -43,27 +47,11 @@ class CategoryRepositoryImpl @Inject constructor(
         categoryDao.delete(category)
     }
 
-    override suspend fun getCategoryCount(): Int {
-        return categoryDao.getCount()
+    override suspend fun getCategoryCountByUser(userId: String): Int {
+        return categoryDao.getCountByUser(userId)
     }
 
-    override suspend fun deleteAllCategories() {
-        categoryDao.deleteAll()
-    }
-
-    override suspend fun initializeDefaultCategories() {
-        if (getCategoryCount() == 0) {
-            val defaultCategories = listOf(
-                Category(name = "Food", icon = "restaurant", color = 0xFFE57373),
-                Category(name = "Transport", icon = "directions_car", color = 0xFF64B5F6),
-                Category(name = "Shopping", icon = "shopping_bag", color = 0xFFBA68C8),
-                Category(name = "Entertainment", icon = "movie", color = 0xFFFFB74D),
-                Category(name = "Bills", icon = "receipt", color = 0xFF4DB6AC),
-                Category(name = "Health", icon = "medical_services", color = 0xFFEF5350),
-                Category(name = "Salary", icon = "payments", color = 0xFF81C784),
-                Category(name = "Other", icon = "more_horiz", color = 0xFF90A4AE)
-            )
-            insertCategories(defaultCategories)
-        }
+    override suspend fun deleteAllByUser(userId: String) {
+        categoryDao.deleteAllByUser(userId)
     }
 }

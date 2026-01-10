@@ -1,13 +1,23 @@
 package com.projekt.xvizvary.ui.screens.limits
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.projekt.xvizvary.database.model.Category
 import com.projekt.xvizvary.database.model.Limit
-import com.projekt.xvizvary.database.model.LimitWithSpent
 import com.projekt.xvizvary.ui.theme.SmartBudgetTheme
 import org.junit.Rule
 import org.junit.Test
@@ -19,8 +29,12 @@ class LimitsScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    private val testUserId = "testUser123"
+
     private val testCategory = Category(
         id = 1,
+        firestoreId = "cat1",
+        userId = testUserId,
         name = "Food",
         icon = "restaurant",
         color = 0xFFE57373
@@ -28,12 +42,14 @@ class LimitsScreenTest {
 
     private val testLimit = Limit(
         id = 1,
-        categoryId = 1,
+        firestoreId = "limit1",
+        userId = testUserId,
+        categoryId = "cat1",
         limitAmount = 5000.0,
         periodMonths = 1
     )
 
-    private val testLimitWithSpent = LimitWithSpent(
+    private val testLimitWithSpent = LimitWithSpentDisplay(
         limit = testLimit,
         category = testCategory,
         spentAmount = 2500.0
@@ -98,7 +114,7 @@ class LimitsScreenTest {
 
     @Test
     fun limitsScreen_limitCard_isClickable() {
-        var clickedLimitId: Long? = null
+        var clickedLimitId: String? = null
         
         composeTestRule.setContent {
             SmartBudgetTheme {
@@ -115,55 +131,43 @@ class LimitsScreenTest {
         }
 
         composeTestRule.onNodeWithText("Food").performClick()
-        assert(clickedLimitId == 1L)
+        assert(clickedLimitId == "limit1")
     }
 }
 
 // Helper composable for testing
-@androidx.compose.runtime.Composable
+@Composable
 private fun LimitsScreenContent(
     uiState: LimitsUiState,
-    onLimitClick: (Long) -> Unit,
+    onLimitClick: (String) -> Unit,
     onAddLimit: () -> Unit,
-    onDeleteLimit: (LimitWithSpent) -> Unit
+    onDeleteLimit: (LimitWithSpentDisplay) -> Unit
 ) {
-    androidx.compose.foundation.layout.Column(
-        modifier = androidx.compose.ui.Modifier
+    Column(
+        modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        androidx.compose.material3.Text(
+        Text(
             text = "Limits",
-            style = androidx.compose.material3.MaterialTheme.typography.titleLarge
+            style = MaterialTheme.typography.titleLarge
         )
 
         if (uiState.limits.isEmpty() && !uiState.isLoading) {
-            androidx.compose.material3.Text(text = "Nothing here yet.")
+            Text(text = "Nothing here yet.")
         } else {
             uiState.limits.forEach { limitWithSpent ->
-                androidx.compose.material3.Card(
-                    modifier = androidx.compose.ui.Modifier.fillMaxWidth(),
-                    onClick = { onLimitClick(limitWithSpent.limit.id) }
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { onLimitClick(limitWithSpent.limit.firestoreId) }
                 ) {
-                    androidx.compose.material3.Text(
+                    Text(
                         text = limitWithSpent.category.name,
-                        modifier = androidx.compose.ui.Modifier.padding(16.dp)
+                        modifier = Modifier.padding(16.dp)
                     )
                 }
             }
         }
     }
 }
-
-private fun androidx.compose.ui.Modifier.fillMaxSize() = 
-    this.then(androidx.compose.foundation.layout.fillMaxSize())
-
-private fun androidx.compose.ui.Modifier.fillMaxWidth() = 
-    this.then(androidx.compose.foundation.layout.fillMaxWidth())
-
-private fun androidx.compose.ui.Modifier.padding(dp: androidx.compose.ui.unit.Dp) = 
-    this.then(androidx.compose.foundation.layout.padding(dp))
-
-private val Int.dp: androidx.compose.ui.unit.Dp
-    get() = androidx.compose.ui.unit.Dp(this.toFloat())

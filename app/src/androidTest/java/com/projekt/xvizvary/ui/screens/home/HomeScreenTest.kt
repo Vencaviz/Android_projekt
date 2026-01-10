@@ -1,14 +1,25 @@
 package com.projekt.xvizvary.ui.screens.home
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.projekt.xvizvary.database.model.Category
 import com.projekt.xvizvary.database.model.Transaction
 import com.projekt.xvizvary.database.model.TransactionType
-import com.projekt.xvizvary.database.model.TransactionWithCategory
 import com.projekt.xvizvary.ui.theme.SmartBudgetTheme
 import org.junit.Rule
 import org.junit.Test
@@ -20,28 +31,36 @@ class HomeScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    private val testUserId = "testUser123"
+
     private val testCategory = Category(
         id = 1,
+        firestoreId = "cat1",
+        userId = testUserId,
         name = "Food",
         icon = "restaurant",
         color = 0xFFE57373
     )
 
     private val testTransactions = listOf(
-        TransactionWithCategory(
+        TransactionWithCategoryDisplay(
             transaction = Transaction(
                 id = 1,
+                firestoreId = "tx1",
+                userId = testUserId,
                 name = "Grocery Shopping",
                 amount = 500.0,
                 type = TransactionType.EXPENSE,
-                categoryId = 1,
+                categoryId = "cat1",
                 date = System.currentTimeMillis()
             ),
             category = testCategory
         ),
-        TransactionWithCategory(
+        TransactionWithCategoryDisplay(
             transaction = Transaction(
                 id = 2,
+                firestoreId = "tx2",
+                userId = testUserId,
                 name = "Monthly Salary",
                 amount = 25000.0,
                 type = TransactionType.INCOME,
@@ -143,54 +162,42 @@ class HomeScreenTest {
 }
 
 // Helper composable for testing without ViewModel
-@androidx.compose.runtime.Composable
+@Composable
 private fun HomeScreenContent(
     uiState: HomeUiState,
     onAddTransaction: () -> Unit,
-    onDeleteTransaction: (TransactionWithCategory) -> Unit
+    onDeleteTransaction: (TransactionWithCategoryDisplay) -> Unit
 ) {
-    androidx.compose.foundation.layout.Column(
-        modifier = androidx.compose.ui.Modifier
-            .androidx.compose.foundation.layout.fillMaxSize()
-            .androidx.compose.foundation.layout.padding(16.dp),
-        verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        androidx.compose.material3.Card(modifier = androidx.compose.ui.Modifier.fillMaxWidth()) {
-            androidx.compose.foundation.layout.Column(
-                modifier = androidx.compose.ui.Modifier.padding(16.dp),
-                verticalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                androidx.compose.material3.Text(
+                Text(
                     text = "Overview",
-                    style = androidx.compose.material3.MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge
                 )
-                androidx.compose.material3.Button(
+                Button(
                     onClick = onAddTransaction,
-                    modifier = androidx.compose.ui.Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    androidx.compose.material3.Text(text = "Add transaction")
+                    Text(text = "Add transaction")
                 }
             }
         }
 
         if (uiState.transactions.isEmpty() && !uiState.isLoading) {
-            androidx.compose.material3.Text(text = "Nothing here yet.")
+            Text(text = "Nothing here yet.")
         } else {
             uiState.transactions.forEach { tx ->
-                androidx.compose.material3.Text(text = tx.transaction.name)
+                Text(text = tx.transaction.name)
             }
         }
     }
 }
-
-private val androidx.compose.ui.Modifier.fillMaxSize: androidx.compose.ui.Modifier
-    get() = this.then(androidx.compose.foundation.layout.fillMaxSize())
-
-private val androidx.compose.ui.Modifier.fillMaxWidth: androidx.compose.ui.Modifier
-    get() = this.then(androidx.compose.foundation.layout.fillMaxWidth())
-
-private fun androidx.compose.ui.Modifier.padding(dp: androidx.compose.ui.unit.Dp) = 
-    this.then(androidx.compose.foundation.layout.padding(dp))
-
-private val Int.dp: androidx.compose.ui.unit.Dp
-    get() = androidx.compose.ui.unit.dp.times(this.toFloat())

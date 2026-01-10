@@ -3,10 +3,11 @@ package com.projekt.xvizvary.ui.screens.transaction
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.projekt.xvizvary.auth.repository.UserRepository
-import com.projekt.xvizvary.firebase.model.FirestoreCategory
-import com.projekt.xvizvary.firebase.model.FirestoreTransaction
-import com.projekt.xvizvary.firebase.repository.FirestoreCategoryRepository
-import com.projekt.xvizvary.firebase.repository.FirestoreTransactionRepository
+import com.projekt.xvizvary.database.model.Category
+import com.projekt.xvizvary.database.model.Transaction
+import com.projekt.xvizvary.database.model.TransactionType
+import com.projekt.xvizvary.database.repository.CategoryRepository
+import com.projekt.xvizvary.sync.SyncRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +30,7 @@ data class AddTransactionUiState(
     val selectedCategoryId: String? = null,
     val date: Long = System.currentTimeMillis(),
     val note: String = "",
-    val categories: List<FirestoreCategory> = emptyList(),
+    val categories: List<Category> = emptyList(),
     val isLoading: Boolean = false,
     val nameError: String? = null,
     val amountError: String? = null
@@ -43,8 +44,8 @@ sealed class AddTransactionEvent {
 @HiltViewModel
 class AddTransactionViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val transactionRepository: FirestoreTransactionRepository,
-    private val categoryRepository: FirestoreCategoryRepository
+    private val categoryRepository: CategoryRepository,
+    private val syncRepository: SyncRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddTransactionUiState())
@@ -60,7 +61,8 @@ class AddTransactionViewModel @Inject constructor(
     private fun loadCategories() {
         val userId = userRepository.getCurrentUserId() ?: return
         viewModelScope.launch {
-            categoryRepository.getCategories(userId).collect { categories ->
+            // Load categories from local DB
+            categoryRepository.getCategoriesByUser(userId).collect { categories ->
                 _uiState.value = _uiState.value.copy(categories = categories)
             }
         }
@@ -124,16 +126,18 @@ class AddTransactionViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true)
 
             try {
-                val transaction = FirestoreTransaction(
+                val transaction = Transaction(
+                    userId = userId,
                     name = state.name.trim(),
                     amount = amountValue!!,
-                    type = state.type.name,
+                    type = TransactionType.valueOf(state.type.name),
                     categoryId = state.selectedCategoryId,
                     date = state.date,
                     note = state.note.takeIf { it.isNotBlank() }
                 )
 
-                transactionRepository.addTransaction(userId, transaction)
+                // Save via SyncRepository (saves to both local and cloud)
+                syncRepository.addTransaction(userId, transaction)
                 _events.emit(AddTransactionEvent.TransactionSaved)
             } catch (e: Exception) {
                 _events.emit(AddTransactionEvent.Error(e.message ?: "Unknown error"))

@@ -3,21 +3,24 @@ package com.projekt.xvizvary.ui.screens.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.projekt.xvizvary.auth.repository.UserRepository
-import com.projekt.xvizvary.firebase.model.FirestoreCategory
-import com.projekt.xvizvary.firebase.model.FirestoreTransaction
-import com.projekt.xvizvary.firebase.repository.FirestoreCategoryRepository
-import com.projekt.xvizvary.firebase.repository.FirestoreTransactionRepository
+import com.projekt.xvizvary.database.model.Category
+import com.projekt.xvizvary.database.model.Transaction
+import com.projekt.xvizvary.database.model.TransactionType
+import com.projekt.xvizvary.database.repository.CategoryRepository
+import com.projekt.xvizvary.database.repository.TransactionRepository
+import com.projekt.xvizvary.sync.SyncRepository
 import com.projekt.xvizvary.util.DateUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class TransactionWithCategoryDisplay(
-    val transaction: FirestoreTransaction,
-    val category: FirestoreCategory?
+    val transaction: Transaction,
+    val category: Category?
 )
 
 data class HomeUiState(
@@ -32,14 +35,15 @@ data class HomeUiState(
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val transactionRepository: FirestoreTransactionRepository,
-    private val categoryRepository: FirestoreCategoryRepository
+    private val transactionRepository: TransactionRepository,
+    private val categoryRepository: CategoryRepository,
+    private val syncRepository: SyncRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
-    private var categories: Map<String, FirestoreCategory> = emptyMap()
+    private var categories: Map<String, Category> = emptyMap()
 
     init {
         loadData()
@@ -51,12 +55,12 @@ class HomeViewModel @Inject constructor(
         val endOfMonth = DateUtils.getEndOfMonth()
 
         viewModelScope.launch {
-            // Load categories first
-            categories = categoryRepository.getCategoriesOnce(userId)
-                .associateBy { it.id }
+            // Load categories from local DB
+            categories = categoryRepository.getCategoriesByUserOnce(userId)
+                .associateBy { it.firestoreId }
 
-            // Load transactions for current month
-            transactionRepository.getTransactionsByDateRange(userId, startOfMonth, endOfMonth)
+            // Load transactions for current month from local DB
+            transactionRepository.getTransactionsByUserAndDateRange(userId, startOfMonth, endOfMonth)
                 .collect { transactions ->
                     // Map transactions with their categories
                     val transactionsWithCategory = transactions.map { tx ->
@@ -66,12 +70,12 @@ class HomeViewModel @Inject constructor(
                         )
                     }
 
-                    // Calculate monthly totals
-                    val income = transactionRepository.getSumByTypeAndDateRange(
-                        userId, "INCOME", startOfMonth, endOfMonth
+                    // Calculate monthly totals from local DB
+                    val income = transactionRepository.getSumByUserTypeAndDateRange(
+                        userId, TransactionType.INCOME, startOfMonth, endOfMonth
                     )
-                    val expense = transactionRepository.getSumByTypeAndDateRange(
-                        userId, "EXPENSE", startOfMonth, endOfMonth
+                    val expense = transactionRepository.getSumByUserTypeAndDateRange(
+                        userId, TransactionType.EXPENSE, startOfMonth, endOfMonth
                     )
 
                     _uiState.value = HomeUiState(
@@ -89,7 +93,7 @@ class HomeViewModel @Inject constructor(
     fun deleteTransaction(transaction: TransactionWithCategoryDisplay) {
         val userId = userRepository.getCurrentUserId() ?: return
         viewModelScope.launch {
-            transactionRepository.deleteTransaction(userId, transaction.transaction.id)
+            syncRepository.deleteTransaction(userId, transaction.transaction.firestoreId)
         }
     }
 

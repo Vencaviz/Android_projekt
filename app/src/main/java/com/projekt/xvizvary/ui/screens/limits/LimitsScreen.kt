@@ -124,11 +124,11 @@ fun LimitsScreen(
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(
                             items = uiState.limits,
-                            key = { it.limit.id }
+                            key = { it.limit.firestoreId.ifEmpty { it.limit.id.toString() } }
                         ) { limitWithSpent ->
                             LimitCard(
                                 limitWithSpent = limitWithSpent,
-                                onClick = { onLimitClick(limitWithSpent.limit.id) },
+                                onClick = { onLimitClick(limitWithSpent.limit.firestoreId) },
                                 onDelete = { viewModel.deleteLimit(limitWithSpent) }
                             )
                         }
