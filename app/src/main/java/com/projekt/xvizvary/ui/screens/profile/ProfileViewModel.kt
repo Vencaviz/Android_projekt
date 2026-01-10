@@ -61,16 +61,12 @@ class ProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
 
-            val result = sessionManager.logout()
-
-            result.fold(
-                onSuccess = {
-                    _events.emit(ProfileEvent.LoggedOut)
-                },
-                onFailure = { exception ->
-                    _events.emit(ProfileEvent.Error(exception.message ?: "Logout failed"))
-                }
-            )
+            try {
+                sessionManager.logout()
+                _events.emit(ProfileEvent.LoggedOut)
+            } catch (e: Exception) {
+                _events.emit(ProfileEvent.Error(e.message ?: "Logout failed"))
+            }
 
             _uiState.value = _uiState.value.copy(isLoading = false)
         }
