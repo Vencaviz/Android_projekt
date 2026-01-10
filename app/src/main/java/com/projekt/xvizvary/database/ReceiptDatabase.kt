@@ -1,16 +1,15 @@
 package com.projekt.xvizvary.database
 
 import android.content.Context
-import androidx.databinding.adapters.Converters
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+
+
 import com.projekt.xvizvary.database.model.Receipt
 
 
-@Database(entities = [Receipt::class], version = 4, exportSchema = true)
-@TypeConverters(Converters::class)
+@Database(entities = [Receipt::class], version = 1, exportSchema = true)
 abstract class ReceiptDatabase : RoomDatabase(){
 
     abstract fun receiptDao() : ReceiptDao

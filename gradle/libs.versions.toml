@@ -29,7 +29,8 @@ coil = "2.6.0"
 kotlinxCoroutinesTest = "1.9.0"
 turbine = "1.1.0"
 adapters = "3.2.0-alpha11"
-
+ksp-version = "2.2.20-2.0.4"
+hilt_v = "2.57.1"
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
@@ -94,4 +95,8 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+com-google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt_v" }
+com-google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp-version" }
+
+google-services = { id = "com.google.gms.google-services", version = "4.4.0" }
 
