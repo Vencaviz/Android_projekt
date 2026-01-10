@@ -57,7 +57,29 @@
 
     <!-- Home -->
     <string name="title_transactions">Transactions</string>
-    <string name="label_this_month">This month: %1$s</string>
+    <string name="label_this_month">Balance: %1$s</string>
+    <string name="label_income">Income</string>
+    <string name="label_expense">Expense</string>
+    <string name="label_uncategorized">Uncategorized</string>
+    <string name="hint_add_first_transaction">Add your first transaction</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="label_note">Note</string>
+    <string name="label_transaction_type">Transaction type</string>
+    <string name="error_empty_name">Name is required</string>
+    <string name="error_invalid_amount">Enter a valid amount</string>
+    <string name="message_transaction_saved">Transaction saved</string>
+    <string name="action_add_limit">Add limit</string>
+    <string name="hint_add_first_limit">Set your first spending limit</string>
+    <string name="label_spent_of_limit">%1$s of %2$s</string>
+    <string name="label_remaining">%1$s left</string>
+    <string name="label_limit_amount">Limit amount</string>
+    <string name="message_limit_saved">Limit saved</string>
+    <string name="error_select_category">Select a category</string>
+    <string name="title_add_limit">Add limit</string>
+    <string name="title_edit_limit">Edit limit</string>
+    <string name="message_all_categories_have_limits">All categories already have limits</string>
 
     <!-- Exchange rate -->
     <string name="label_buy">Buy</string>

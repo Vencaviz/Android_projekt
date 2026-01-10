@@ -57,7 +57,29 @@
 
     <!-- Home -->
     <string name="title_transactions">Transakce</string>
-    <string name="label_this_month">Tento měsíc: %1$s</string>
+    <string name="label_this_month">Zůstatek: %1$s</string>
+    <string name="label_income">Příjmy</string>
+    <string name="label_expense">Výdaje</string>
+    <string name="label_uncategorized">Bez kategorie</string>
+    <string name="hint_add_first_transaction">Přidejte svou první transakci</string>
+    <string name="action_delete">Smazat</string>
+    <string name="action_save">Uložit</string>
+    <string name="action_cancel">Zrušit</string>
+    <string name="label_note">Poznámka</string>
+    <string name="label_transaction_type">Typ transakce</string>
+    <string name="error_empty_name">Název je povinný</string>
+    <string name="error_invalid_amount">Zadejte platnou částku</string>
+    <string name="message_transaction_saved">Transakce uložena</string>
+    <string name="action_add_limit">Přidat limit</string>
+    <string name="hint_add_first_limit">Nastavte svůj první limit výdajů</string>
+    <string name="label_spent_of_limit">%1$s z %2$s</string>
+    <string name="label_remaining">Zbývá %1$s</string>
+    <string name="label_limit_amount">Částka limitu</string>
+    <string name="message_limit_saved">Limit uložen</string>
+    <string name="error_select_category">Vyberte kategorii</string>
+    <string name="title_add_limit">Přidat limit</string>
+    <string name="title_edit_limit">Upravit limit</string>
+    <string name="message_all_categories_have_limits">Všechny kategorie už mají limity</string>
 
     <!-- Exchange rate -->
     <string name="label_buy">Nákup</string>

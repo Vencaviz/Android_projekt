@@ -13,10 +13,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.projekt.xvizvary.ui.screens.auth.SignInScreen
 import com.projekt.xvizvary.ui.screens.auth.SignUpScreen
 import com.projekt.xvizvary.ui.screens.home.HomeScreen
@@ -28,6 +30,7 @@ import com.projekt.xvizvary.ui.screens.search.SearchScreen
 import com.projekt.xvizvary.ui.screens.tools.ExchangeRateScreen
 import com.projekt.xvizvary.ui.screens.tools.InterestRateScreen
 import com.projekt.xvizvary.ui.screens.profile.ProfileScreen
+import com.projekt.xvizvary.ui.screens.transaction.AddTransactionScreen
 
 @Composable
 fun SmartBudgetRoot() {
@@ -105,9 +108,17 @@ fun SmartBudgetRoot() {
 
             composable(Destination.Home.route) {
                 HomeScreen(
-                    onAddTransaction = { navController.navigate(Destination.Limits.route) } // placeholder
+                    onAddTransaction = { navController.navigate(Destination.AddTransaction.route) }
                 )
             }
+
+            composable(Destination.AddTransaction.route) {
+                AddTransactionScreen(
+                    onTransactionSaved = { navController.navigateUp() },
+                    onCancel = { navController.navigateUp() }
+                )
+            }
+
             composable(Destination.Search.route) {
                 SearchScreen(
                     onAtmMap = { navController.navigate(Destination.AtmMap.route) },
@@ -120,9 +131,25 @@ fun SmartBudgetRoot() {
             composable(Destination.InterestRate.route) { InterestRateScreen() }
 
             composable(Destination.Limits.route) {
-                LimitsScreen(onLimitClick = { navController.navigate(Destination.LimitDetail.route) })
+                LimitsScreen(
+                    onLimitClick = { limitId -> 
+                        navController.navigate(Destination.LimitDetail.createRoute(limitId)) 
+                    },
+                    onAddLimit = { 
+                        navController.navigate(Destination.LimitDetail.createRoute(0)) 
+                    }
+                )
             }
-            composable(Destination.LimitDetail.route) { LimitDetailScreen() }
+
+            composable(
+                route = Destination.LimitDetail.route,
+                arguments = listOf(navArgument("limitId") { type = NavType.LongType })
+            ) {
+                LimitDetailScreen(
+                    onLimitSaved = { navController.navigateUp() },
+                    onCancel = { navController.navigateUp() }
+                )
+            }
 
             composable(Destination.Profile.route) { ProfileScreen() }
             composable(Destination.ReceiptScan.route) { ReceiptScanScreen() }
@@ -132,18 +159,20 @@ fun SmartBudgetRoot() {
 
 @Composable
 private fun destinationTitle(route: String?): String {
-    val resId = when (route) {
-        Destination.SignIn.route -> Destination.SignIn.titleRes
-        Destination.SignUp.route -> Destination.SignUp.titleRes
-        Destination.Home.route -> Destination.Home.titleRes
-        Destination.Search.route -> Destination.Search.titleRes
-        Destination.Limits.route -> Destination.Limits.titleRes
-        Destination.Profile.route -> Destination.Profile.titleRes
-        Destination.LimitDetail.route -> Destination.LimitDetail.titleRes
-        Destination.ExchangeRate.route -> Destination.ExchangeRate.titleRes
-        Destination.InterestRate.route -> Destination.InterestRate.titleRes
-        Destination.AtmMap.route -> Destination.AtmMap.titleRes
-        Destination.ReceiptScan.route -> Destination.ReceiptScan.titleRes
+    val baseRoute = route?.substringBefore("/")
+    val resId = when (baseRoute) {
+        "sign_in" -> Destination.SignIn.titleRes
+        "sign_up" -> Destination.SignUp.titleRes
+        "home" -> Destination.Home.titleRes
+        "search" -> Destination.Search.titleRes
+        "limits" -> Destination.Limits.titleRes
+        "profile" -> Destination.Profile.titleRes
+        "limit_detail" -> Destination.LimitDetail.titleRes
+        "add_transaction" -> Destination.AddTransaction.titleRes
+        "exchange_rate" -> Destination.ExchangeRate.titleRes
+        "interest_rate" -> Destination.InterestRate.titleRes
+        "atm_map" -> Destination.AtmMap.titleRes
+        "receipt_scan" -> Destination.ReceiptScan.titleRes
         else -> null
     }
     return if (resId != null) stringResource(resId) else ""

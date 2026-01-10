@@ -15,7 +15,10 @@ sealed class Destination(
     data object Limits : Destination("limits", R.string.screen_limits)
     data object Profile : Destination("profile", R.string.screen_profile)
 
-    data object LimitDetail : Destination("limit_detail", R.string.screen_limit_detail)
+    data object AddTransaction : Destination("add_transaction", R.string.action_add_transaction)
+    data object LimitDetail : Destination("limit_detail/{limitId}", R.string.screen_limit_detail) {
+        fun createRoute(limitId: Long = 0) = "limit_detail/$limitId"
+    }
     data object ExchangeRate : Destination("exchange_rate", R.string.screen_exchange_rate)
     data object InterestRate : Destination("interest_rate", R.string.screen_interest_rate)
     data object AtmMap : Destination("atm_map", R.string.screen_search)
