@@ -151,7 +151,15 @@ fun SmartBudgetRoot() {
                 )
             }
 
-            composable(Destination.Profile.route) { ProfileScreen() }
+            composable(Destination.Profile.route) { 
+                ProfileScreen(
+                    onLoggedOut = {
+                        navController.navigate(Destination.SignIn.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                )
+            }
             composable(Destination.ReceiptScan.route) { ReceiptScanScreen() }
         }
     }

@@ -81,6 +81,19 @@
     <string name="title_edit_limit">Upravit limit</string>
     <string name="message_all_categories_have_limits">Všechny kategorie už mají limity</string>
 
+    <!-- Auth -->
+    <string name="error_invalid_email">Zadejte platný e-mail</string>
+    <string name="error_invalid_password">Heslo musí mít alespoň 6 znaků</string>
+    <string name="error_passwords_dont_match">Hesla se neshodují</string>
+    <string name="label_confirm_password">Potvrdit heslo</string>
+    <string name="message_sign_in_success">Úspěšně přihlášeno</string>
+    <string name="message_sign_up_success">Účet úspěšně vytvořen</string>
+    <string name="action_logout">Odhlásit se</string>
+    <string name="label_logged_in_as">Přihlášen jako</string>
+    <string name="message_logged_out">Úspěšně odhlášeno</string>
+    <string name="hint_no_account">Nemáte účet?</string>
+    <string name="hint_have_account">Již máte účet?</string>
+
     <!-- Exchange rate -->
     <string name="label_buy">Nákup</string>
     <string name="label_sell">Prodej</string>
