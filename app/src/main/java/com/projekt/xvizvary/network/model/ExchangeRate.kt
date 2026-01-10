@@ -1,13 +1,11 @@
 package com.projekt.xvizvary.network.model
 
-/**
- * UI model for displaying exchange rates
- */
+
 data class ExchangeRate(
     val currencyCode: String,
     val currencyName: String,
     val rate: Double,
-    val inverseRate: Double // How much CZK for 1 unit of foreign currency
+    val inverseRate: Double
 ) {
     val formattedRate: String
         get() = String.format("%.4f", rate)
@@ -16,9 +14,7 @@ data class ExchangeRate(
         get() = String.format("%.2f", inverseRate)
 }
 
-/**
- * Common currency names for display
- */
+
 object CurrencyNames {
     private val names = mapOf(
         "EUR" to "Euro",
