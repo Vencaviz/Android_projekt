@@ -1,20 +1,29 @@
 package com.projekt.xvizvary.database.model
 
-
-import android.net.Uri
 import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-
-@Entity(tableName = "receipts")
+@Entity(
+    tableName = "receipts",
+    foreignKeys = [
+        ForeignKey(
+            entity = Transaction::class,
+            parentColumns = ["id"],
+            childColumns = ["transactionId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index(value = ["transactionId"])]
+)
 data class Receipt(
-    var Store: String,
-    var type: String,
-    var amount: String,
-
-    ) {
     @PrimaryKey(autoGenerate = true)
-    var id:Long? = null
-
-
-}
+    val id: Long = 0,
+    val storeName: String,
+    val totalAmount: Double,
+    val date: Long, // timestamp in milliseconds
+    val rawText: String, // Original OCR text
+    val transactionId: Long? = null, // Linked transaction if created
+    val createdAt: Long = System.currentTimeMillis()
+)

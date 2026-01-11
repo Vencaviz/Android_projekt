@@ -57,12 +57,82 @@
 
     <!-- Home -->
     <string name="title_transactions">Transactions</string>
-    <string name="label_this_month">This month: %1$s</string>
+    <string name="label_this_month">Balance: %1$s</string>
+    <string name="label_income">Income</string>
+    <string name="label_expense">Expense</string>
+    <string name="label_uncategorized">Uncategorized</string>
+    <string name="hint_add_first_transaction">Add your first transaction</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_save">Save</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="label_note">Note</string>
+    <string name="label_transaction_type">Transaction type</string>
+    <string name="error_empty_name">Name is required</string>
+    <string name="error_invalid_amount">Enter a valid amount</string>
+    <string name="message_transaction_saved">Transaction saved</string>
+    <string name="action_add_limit">Add limit</string>
+    <string name="hint_add_first_limit">Set your first spending limit</string>
+    <string name="label_spent_of_limit">%1$s of %2$s</string>
+    <string name="label_remaining">%1$s left</string>
+    <string name="label_over_budget">%1$s over budget</string>
+    <string name="label_daily_spending">Daily Spending</string>
+    <string name="message_no_spending_data">No spending data yet</string>
+    <string name="message_no_transactions_in_category">No transactions in this category</string>
+    <string name="label_limit_amount">Limit amount</string>
+    <string name="message_limit_saved">Limit saved</string>
+    <string name="error_select_category">Select a category</string>
+    <string name="title_add_limit">Add limit</string>
+    <string name="title_edit_limit">Edit limit</string>
+    <string name="message_all_categories_have_limits">All categories already have limits</string>
+
+    <!-- Auth -->
+    <string name="error_invalid_email">Enter a valid email</string>
+    <string name="error_invalid_password">Password must be at least 6 characters</string>
+    <string name="error_passwords_dont_match">Passwords do not match</string>
+    <string name="label_confirm_password">Confirm password</string>
+    <string name="message_sign_in_success">Signed in successfully</string>
+    <string name="message_sign_up_success">Account created successfully</string>
+    <string name="action_logout">Log out</string>
+    <string name="label_logged_in_as">Logged in as</string>
+    <string name="message_logged_out">Logged out successfully</string>
+    <string name="hint_no_account">Don\'t have an account?</string>
+    <string name="hint_have_account">Already have an account?</string>
+
+    <!-- Receipt Scan -->
+    <string name="message_receipt_saved">Receipt saved and transaction created</string>
+    <string name="hint_point_at_receipt">Point camera at receipt</string>
+    <string name="label_detected_text">Detected text</string>
+    <string name="action_capture">Capture</string>
+    <string name="title_confirm_receipt">Confirm receipt data</string>
+    <string name="label_store_name">Store name</string>
+    <string name="label_raw_text">Recognized text</string>
+    <string name="action_rescan">Rescan</string>
+    <string name="permission_camera_rationale">Camera permission is required to scan receipts</string>
+    <string name="action_grant_permission">Grant permission</string>
+    <string name="message_requesting_permission">Requesting camera permission…</string>
 
     <!-- Exchange rate -->
     <string name="label_buy">Buy</string>
     <string name="label_sell">Sell</string>
+    <string name="label_per_unit">per %1$s</string>
+    <string name="action_refresh">Refresh</string>
+
+    <!-- Interest rate -->
+    <string name="label_current_rate">Current Rate</string>
+    <string name="label_last_updated">Last updated</string>
+    <string name="label_country">Country</string>
+    <string name="label_institution">Institution</string>
+    <string name="label_type">Type</string>
+    <string name="label_central_bank">Central Bank</string>
+    <string name="label_market_rate">Market Rate</string>
+    <string name="label_historical_trend">Historical Trend</string>
+    <string name="label_last_12_months">Last 12 months</string>
 
     <!-- Map -->
     <string name="label_atm">ATM</string>
+    <string name="hint_search_atm">Search ATM or bank</string>
+    <string name="filter_all">All</string>
+    <string name="label_atm_results">ATMs found</string>
+    <string name="label_deposit">Deposit</string>
+    <string name="label_open_24h">Open 24/7</string>
 </resources>

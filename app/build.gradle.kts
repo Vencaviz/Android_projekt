@@ -5,8 +5,8 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.google.services)
     kotlin("kapt")
-
 }
 
 android {
@@ -89,24 +89,27 @@ dependencies {
     implementation(libs.androidx.camera.view)
     implementation(libs.androidx.camera.compose)
     implementation(libs.androidx.camera.core)
+    
+    // Guava for ListenableFuture (required by CameraX)
+    implementation("com.google.guava:guava:32.1.3-android")
 
     // Images
     implementation(libs.coil.compose)
 
-    //Firebase
-    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
-
-
-    // Import the Firebase BoM
-    implementation(platform("com.google.firebase:firebase-bom:34.5.0"))
-
-    // Firebase Authentication
-    implementation("com.google.firebase:firebase-auth-ktx:22.2.0")
-    implementation("com.google.android.gms:play-services-auth:20.7.0")
+    // Permissions
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
     // Firebase BoM (Bill of Materials)
-    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
-    implementation("com.google.firebase:firebase-auth")
+    implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
+
+    // Firebase Authentication
+    implementation("com.google.firebase:firebase-auth-ktx")
+    
+    // Firebase Firestore
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    
+    // Google Play Services Auth
+    implementation("com.google.android.gms:play-services-auth:21.0.0")
 
 
     testImplementation(libs.junit)
@@ -115,6 +118,8 @@ dependencies {
     testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.turbine)
     testImplementation(libs.dagger.hilt.android.testing)
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+    testImplementation("org.mockito:mockito-core:5.8.0")
     kaptTest(libs.dagger.hilt.compiler)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

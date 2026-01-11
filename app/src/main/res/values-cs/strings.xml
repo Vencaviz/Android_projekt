@@ -57,13 +57,83 @@
 
     <!-- Home -->
     <string name="title_transactions">Transakce</string>
-    <string name="label_this_month">Tento měsíc: %1$s</string>
+    <string name="label_this_month">Zůstatek: %1$s</string>
+    <string name="label_income">Příjmy</string>
+    <string name="label_expense">Výdaje</string>
+    <string name="label_uncategorized">Bez kategorie</string>
+    <string name="hint_add_first_transaction">Přidejte svou první transakci</string>
+    <string name="action_delete">Smazat</string>
+    <string name="action_save">Uložit</string>
+    <string name="action_cancel">Zrušit</string>
+    <string name="label_note">Poznámka</string>
+    <string name="label_transaction_type">Typ transakce</string>
+    <string name="error_empty_name">Název je povinný</string>
+    <string name="error_invalid_amount">Zadejte platnou částku</string>
+    <string name="message_transaction_saved">Transakce uložena</string>
+    <string name="action_add_limit">Přidat limit</string>
+    <string name="hint_add_first_limit">Nastavte svůj první limit výdajů</string>
+    <string name="label_spent_of_limit">%1$s z %2$s</string>
+    <string name="label_remaining">Zbývá %1$s</string>
+    <string name="label_over_budget">%1$s přes rozpočet</string>
+    <string name="label_daily_spending">Denní útraty</string>
+    <string name="message_no_spending_data">Zatím žádná data o útratách</string>
+    <string name="message_no_transactions_in_category">Žádné transakce v této kategorii</string>
+    <string name="label_limit_amount">Částka limitu</string>
+    <string name="message_limit_saved">Limit uložen</string>
+    <string name="error_select_category">Vyberte kategorii</string>
+    <string name="title_add_limit">Přidat limit</string>
+    <string name="title_edit_limit">Upravit limit</string>
+    <string name="message_all_categories_have_limits">Všechny kategorie už mají limity</string>
+
+    <!-- Auth -->
+    <string name="error_invalid_email">Zadejte platný e-mail</string>
+    <string name="error_invalid_password">Heslo musí mít alespoň 6 znaků</string>
+    <string name="error_passwords_dont_match">Hesla se neshodují</string>
+    <string name="label_confirm_password">Potvrdit heslo</string>
+    <string name="message_sign_in_success">Úspěšně přihlášeno</string>
+    <string name="message_sign_up_success">Účet úspěšně vytvořen</string>
+    <string name="action_logout">Odhlásit se</string>
+    <string name="label_logged_in_as">Přihlášen jako</string>
+    <string name="message_logged_out">Úspěšně odhlášeno</string>
+    <string name="hint_no_account">Nemáte účet?</string>
+    <string name="hint_have_account">Již máte účet?</string>
+
+    <!-- Receipt Scan -->
+    <string name="message_receipt_saved">Účtenka uložena a transakce vytvořena</string>
+    <string name="hint_point_at_receipt">Namiřte kameru na účtenku</string>
+    <string name="label_detected_text">Rozpoznaný text</string>
+    <string name="action_capture">Vyfotit</string>
+    <string name="title_confirm_receipt">Potvrďte údaje z účtenky</string>
+    <string name="label_store_name">Název obchodu</string>
+    <string name="label_raw_text">Rozpoznaný text</string>
+    <string name="action_rescan">Znovu skenovat</string>
+    <string name="permission_camera_rationale">Pro skenování účtenek je potřeba oprávnění k fotoaparátu</string>
+    <string name="action_grant_permission">Povolit</string>
+    <string name="message_requesting_permission">Žádost o oprávnění fotoaparátu…</string>
 
     <!-- Exchange rate -->
     <string name="label_buy">Nákup</string>
     <string name="label_sell">Prodej</string>
+    <string name="label_per_unit">za %1$s</string>
+    <string name="action_refresh">Obnovit</string>
+
+    <!-- Interest rate -->
+    <string name="label_current_rate">Aktuální sazba</string>
+    <string name="label_last_updated">Naposledy aktualizováno</string>
+    <string name="label_country">Země</string>
+    <string name="label_institution">Instituce</string>
+    <string name="label_type">Typ</string>
+    <string name="label_central_bank">Centrální banka</string>
+    <string name="label_market_rate">Tržní sazba</string>
+    <string name="label_historical_trend">Historický vývoj</string>
+    <string name="label_last_12_months">Posledních 12 měsíců</string>
 
     <!-- Map -->
     <string name="label_atm">Bankomat</string>
+    <string name="hint_search_atm">Hledat bankomat nebo banku</string>
+    <string name="filter_all">Vše</string>
+    <string name="label_atm_results">Nalezené bankomaty</string>
+    <string name="label_deposit">Vklad</string>
+    <string name="label_open_24h">Otevřeno 24/7</string>
 </resources>
 
