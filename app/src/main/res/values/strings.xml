@@ -74,6 +74,10 @@
     <string name="hint_add_first_limit">Set your first spending limit</string>
     <string name="label_spent_of_limit">%1$s of %2$s</string>
     <string name="label_remaining">%1$s left</string>
+    <string name="label_over_budget">%1$s over budget</string>
+    <string name="label_daily_spending">Daily Spending</string>
+    <string name="message_no_spending_data">No spending data yet</string>
+    <string name="message_no_transactions_in_category">No transactions in this category</string>
     <string name="label_limit_amount">Limit amount</string>
     <string name="message_limit_saved">Limit saved</string>
     <string name="error_select_category">Select a category</string>

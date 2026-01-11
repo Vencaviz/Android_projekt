@@ -74,6 +74,10 @@
     <string name="hint_add_first_limit">Nastavte svůj první limit výdajů</string>
     <string name="label_spent_of_limit">%1$s z %2$s</string>
     <string name="label_remaining">Zbývá %1$s</string>
+    <string name="label_over_budget">%1$s přes rozpočet</string>
+    <string name="label_daily_spending">Denní útraty</string>
+    <string name="message_no_spending_data">Zatím žádná data o útratách</string>
+    <string name="message_no_transactions_in_category">Žádné transakce v této kategorii</string>
     <string name="label_limit_amount">Částka limitu</string>
     <string name="message_limit_saved">Limit uložen</string>
     <string name="error_select_category">Vyberte kategorii</string>
