@@ -113,6 +113,17 @@
     <string name="label_per_unit">per %1$s</string>
     <string name="action_refresh">Refresh</string>
 
+    <!-- Interest rate -->
+    <string name="label_current_rate">Current Rate</string>
+    <string name="label_last_updated">Last updated</string>
+    <string name="label_country">Country</string>
+    <string name="label_institution">Institution</string>
+    <string name="label_type">Type</string>
+    <string name="label_central_bank">Central Bank</string>
+    <string name="label_market_rate">Market Rate</string>
+    <string name="label_historical_trend">Historical Trend</string>
+    <string name="label_last_12_months">Last 12 months</string>
+
     <!-- Map -->
     <string name="label_atm">ATM</string>
     <string name="hint_search_atm">Search ATM or bank</string>

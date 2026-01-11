@@ -113,6 +113,17 @@
     <string name="label_per_unit">za %1$s</string>
     <string name="action_refresh">Obnovit</string>
 
+    <!-- Interest rate -->
+    <string name="label_current_rate">Aktuální sazba</string>
+    <string name="label_last_updated">Naposledy aktualizováno</string>
+    <string name="label_country">Země</string>
+    <string name="label_institution">Instituce</string>
+    <string name="label_type">Typ</string>
+    <string name="label_central_bank">Centrální banka</string>
+    <string name="label_market_rate">Tržní sazba</string>
+    <string name="label_historical_trend">Historický vývoj</string>
+    <string name="label_last_12_months">Posledních 12 měsíců</string>
+
     <!-- Map -->
     <string name="label_atm">Bankomat</string>
     <string name="hint_search_atm">Hledat bankomat nebo banku</string>
