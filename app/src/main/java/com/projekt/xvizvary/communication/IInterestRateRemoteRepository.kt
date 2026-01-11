@@ -7,7 +7,5 @@ interface IInterestRateRemoteRepository {
 
     suspend fun getAllInterestRates(): CommunicationResult<List<InterestRateDisplay>>
 
-    suspend fun getInterestRateById(id: String): CommunicationResult<InterestRateDisplay?>
-
     suspend fun getHistoricalData(rateId: String): CommunicationResult<List<HistoricalRate>>
 }

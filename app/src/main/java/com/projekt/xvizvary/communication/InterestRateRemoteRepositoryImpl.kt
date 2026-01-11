@@ -18,16 +18,6 @@ class InterestRateRemoteRepositoryImpl @Inject constructor() : IInterestRateRemo
         }
     }
 
-    override suspend fun getInterestRateById(id: String): CommunicationResult<InterestRateDisplay?> {
-        return try {
-            delay(300)
-            val rate = CentralBankData.getAllRates().find { it.id == id }
-            CommunicationResult.Success(rate)
-        } catch (e: Exception) {
-            CommunicationResult.Exception(e)
-        }
-    }
-
     override suspend fun getHistoricalData(rateId: String): CommunicationResult<List<HistoricalRate>> {
         return try {
             delay(300)
