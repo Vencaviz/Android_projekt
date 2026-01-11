@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.projekt.xvizvary.communication.CommunicationResult
 import com.projekt.xvizvary.communication.IInterestRateRemoteRepository
+import com.projekt.xvizvary.network.model.HistoricalRate
 import com.projekt.xvizvary.network.model.InterestRateDisplay
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +17,7 @@ data class InterestRateUiState(
     val isLoading: Boolean = true,
     val rates: List<InterestRateDisplay> = emptyList(),
     val selectedRate: InterestRateDisplay? = null,
+    val historicalData: List<HistoricalRate> = emptyList(),
     val error: String? = null
 )
 
@@ -66,11 +68,28 @@ class InterestRateViewModel @Inject constructor(
     }
 
     fun selectRate(rate: InterestRateDisplay) {
-        _uiState.value = _uiState.value.copy(selectedRate = rate)
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(selectedRate = rate, isLoading = true)
+            
+            when (val result = interestRateRepository.getHistoricalData(rate.id)) {
+                is CommunicationResult.Success -> {
+                    _uiState.value = _uiState.value.copy(
+                        historicalData = result.data,
+                        isLoading = false
+                    )
+                }
+                else -> {
+                    _uiState.value = _uiState.value.copy(
+                        historicalData = emptyList(),
+                        isLoading = false
+                    )
+                }
+            }
+        }
     }
 
     fun clearSelection() {
-        _uiState.value = _uiState.value.copy(selectedRate = null)
+        _uiState.value = _uiState.value.copy(selectedRate = null, historicalData = emptyList())
     }
 
     fun refresh() {

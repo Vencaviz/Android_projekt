@@ -1,67 +1,39 @@
 package com.projekt.xvizvary.communication
 
+import com.projekt.xvizvary.network.model.CentralBankData
+import com.projekt.xvizvary.network.model.HistoricalRate
 import com.projekt.xvizvary.network.model.InterestRateDisplay
-import com.projekt.xvizvary.network.model.InterestRateResponse
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
-class InterestRateRemoteRepositoryImpl @Inject constructor(
-    private val api: InterestRateAPI
-) : IInterestRateRemoteRepository {
+class InterestRateRemoteRepositoryImpl @Inject constructor() : IInterestRateRemoteRepository {
 
     override suspend fun getAllInterestRates(): CommunicationResult<List<InterestRateDisplay>> {
-        return when (val result = processResponse { api.getInterestRates() }) {
-            is CommunicationResult.Success -> {
-                CommunicationResult.Success(mapResponseToRates(result.data))
-            }
-            is CommunicationResult.Error -> result
-            is CommunicationResult.ConnectionError -> result
-            is CommunicationResult.Exception -> result
+        return try {
+            // Simulate network delay
+            delay(500)
+            CommunicationResult.Success(CentralBankData.getAllRates())
+        } catch (e: Exception) {
+            CommunicationResult.Exception(e)
         }
     }
 
-    override suspend fun getInterestRateByCountry(country: String): CommunicationResult<InterestRateDisplay?> {
-        return when (val result = processResponse { api.getInterestRateByCountry(country = country) }) {
-            is CommunicationResult.Success -> {
-                val rates = mapResponseToRates(result.data)
-                CommunicationResult.Success(rates.firstOrNull())
-            }
-            is CommunicationResult.Error -> result
-            is CommunicationResult.ConnectionError -> result
-            is CommunicationResult.Exception -> result
+    override suspend fun getInterestRateById(id: String): CommunicationResult<InterestRateDisplay?> {
+        return try {
+            delay(300)
+            val rate = CentralBankData.getAllRates().find { it.id == id }
+            CommunicationResult.Success(rate)
+        } catch (e: Exception) {
+            CommunicationResult.Exception(e)
         }
     }
 
-    private fun mapResponseToRates(response: InterestRateResponse): List<InterestRateDisplay> {
-        val rates = mutableListOf<InterestRateDisplay>()
-
-        // Map central bank rates
-        response.centralBankRates.forEach { rate ->
-            rates.add(
-                InterestRateDisplay(
-                    id = "${rate.country}_${rate.centralBank}".replace(" ", "_"),
-                    name = rate.centralBank,
-                    country = rate.country,
-                    ratePct = rate.ratePct,
-                    lastUpdated = rate.lastUpdated,
-                    isCentralBank = true
-                )
-            )
+    override suspend fun getHistoricalData(rateId: String): CommunicationResult<List<HistoricalRate>> {
+        return try {
+            delay(300)
+            CommunicationResult.Success(CentralBankData.getHistoricalData(rateId))
+        } catch (e: Exception) {
+            CommunicationResult.Exception(e)
         }
-
-        // Map non-central bank rates
-        response.nonCentralBankRates?.forEach { rate ->
-            rates.add(
-                InterestRateDisplay(
-                    id = rate.name.replace(" ", "_"),
-                    name = rate.name,
-                    country = "",
-                    ratePct = rate.ratePct,
-                    lastUpdated = rate.lastUpdated,
-                    isCentralBank = false
-                )
-            )
-        }
-
-        return rates.sortedBy { it.country.ifEmpty { it.name } }
     }
 }

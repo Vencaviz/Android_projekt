@@ -1,6 +1,5 @@
 package com.projekt.xvizvary.ui.screens.tools
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,9 +18,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -32,7 +33,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -45,8 +45,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.projekt.xvizvary.R
+import com.projekt.xvizvary.network.model.HistoricalRate
 import com.projekt.xvizvary.network.model.InterestRateDisplay
-import kotlin.random.Random
 
 @Composable
 fun InterestRateScreen(
@@ -66,22 +66,26 @@ fun InterestRateScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (uiState.selectedRate != null) {
-                IconButton(onClick = { viewModel.clearSelection() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.action_back)
-                    )
-                }
-            }
-            Text(
-                text = if (uiState.selectedRate != null) 
-                    uiState.selectedRate!!.name 
-                else 
-                    stringResource(R.string.screen_interest_rate),
-                style = MaterialTheme.typography.titleLarge,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f)
-            )
+            ) {
+                if (uiState.selectedRate != null) {
+                    IconButton(onClick = { viewModel.clearSelection() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.action_back)
+                        )
+                    }
+                }
+                Text(
+                    text = if (uiState.selectedRate != null) 
+                        uiState.selectedRate!!.name 
+                    else 
+                        stringResource(R.string.screen_interest_rate),
+                    style = MaterialTheme.typography.titleLarge
+                )
+            }
             IconButton(onClick = { viewModel.refresh() }) {
                 Icon(
                     imageVector = Icons.Default.Refresh,
@@ -91,7 +95,7 @@ fun InterestRateScreen(
         }
 
         when {
-            uiState.isLoading -> {
+            uiState.isLoading && uiState.selectedRate == null -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
@@ -120,7 +124,11 @@ fun InterestRateScreen(
                 }
             }
             uiState.selectedRate != null -> {
-                InterestRateDetailView(rate = uiState.selectedRate!!)
+                InterestRateDetailView(
+                    rate = uiState.selectedRate!!,
+                    historicalData = uiState.historicalData,
+                    isLoading = uiState.isLoading
+                )
             }
             uiState.rates.isEmpty() -> {
                 Box(
@@ -152,7 +160,14 @@ private fun InterestRateCard(
     val rateColor = when {
         rate.ratePct > 5 -> Color(0xFFE53935)
         rate.ratePct > 2 -> Color(0xFFFF9800)
+        rate.ratePct < 0 -> Color(0xFF2196F3)
         else -> Color(0xFF4CAF50)
+    }
+
+    val changeColor = when {
+        rate.change > 0 -> Color(0xFFE53935)
+        rate.change < 0 -> Color(0xFF4CAF50)
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
     Card(
@@ -178,10 +193,7 @@ private fun InterestRateCard(
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = if (rate.isCentralBank) 
-                            Icons.Default.AccountBalance 
-                        else 
-                            Icons.Default.TrendingUp,
+                        imageVector = Icons.Default.AccountBalance,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(20.dp)
@@ -194,13 +206,11 @@ private fun InterestRateCard(
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-                    if (rate.country.isNotEmpty()) {
-                        Text(
-                            text = rate.country,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Text(
+                        text = "${rate.country} (${rate.countryCode})",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
 
@@ -211,133 +221,179 @@ private fun InterestRateCard(
                     color = rateColor,
                     fontWeight = FontWeight.Bold
                 )
-                Text(
-                    text = rate.lastUpdated,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        imageVector = when {
+                            rate.change > 0 -> Icons.AutoMirrored.Filled.TrendingUp
+                            rate.change < 0 -> Icons.AutoMirrored.Filled.TrendingDown
+                            else -> Icons.Default.Remove
+                        },
+                        contentDescription = null,
+                        tint = changeColor,
+                        modifier = Modifier.size(14.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = rate.formattedChange,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = changeColor
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun InterestRateDetailView(rate: InterestRateDisplay) {
+private fun InterestRateDetailView(
+    rate: InterestRateDisplay,
+    historicalData: List<HistoricalRate>,
+    isLoading: Boolean
+) {
     val rateColor = when {
         rate.ratePct > 5 -> Color(0xFFE53935)
         rate.ratePct > 2 -> Color(0xFFFF9800)
+        rate.ratePct < 0 -> Color(0xFF2196F3)
         else -> Color(0xFF4CAF50)
     }
 
-    // Generate mock historical data for demonstration
-    val historicalData = remember(rate.id) {
-        generateMockHistoricalData(rate.ratePct)
+    val changeColor = when {
+        rate.change > 0 -> Color(0xFFE53935)
+        rate.change < 0 -> Color(0xFF4CAF50)
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
 
-    Column(
+    LazyColumn(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         // Current Rate Card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+        item {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                )
             ) {
-                Text(
-                    text = stringResource(R.string.label_current_rate),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = rate.formattedRate,
-                    style = MaterialTheme.typography.displayMedium,
-                    color = rateColor,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "${stringResource(R.string.label_last_updated)}: ${rate.lastUpdated}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
-                )
+                Column(
+                    modifier = Modifier.padding(20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.label_current_rate),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = rate.formattedRate,
+                        style = MaterialTheme.typography.displayMedium,
+                        color = rateColor,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = when {
+                                rate.change > 0 -> Icons.AutoMirrored.Filled.TrendingUp
+                                rate.change < 0 -> Icons.AutoMirrored.Filled.TrendingDown
+                                else -> Icons.Default.Remove
+                            },
+                            contentDescription = null,
+                            tint = changeColor,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = rate.formattedChange,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = changeColor
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "${stringResource(R.string.label_last_updated)}: ${rate.lastUpdated}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f)
+                    )
+                }
             }
         }
 
         // Info Card
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                if (rate.country.isNotEmpty()) {
+        item {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     InfoRow(
                         label = stringResource(R.string.label_country),
-                        value = rate.country
+                        value = "${rate.country} (${rate.countryCode})"
                     )
                     Spacer(modifier = Modifier.height(8.dp))
+                    InfoRow(
+                        label = stringResource(R.string.label_institution),
+                        value = rate.name
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    InfoRow(
+                        label = stringResource(R.string.label_type),
+                        value = stringResource(R.string.label_central_bank)
+                    )
                 }
-                InfoRow(
-                    label = stringResource(R.string.label_institution),
-                    value = rate.name
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                InfoRow(
-                    label = stringResource(R.string.label_type),
-                    value = if (rate.isCentralBank) 
-                        stringResource(R.string.label_central_bank) 
-                    else 
-                        stringResource(R.string.label_market_rate)
-                )
             }
         }
 
         // Historical Chart
-        Card(modifier = Modifier.fillMaxWidth()) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = stringResource(R.string.label_historical_trend),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = stringResource(R.string.label_last_12_months),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                InterestRateChart(
-                    data = historicalData,
-                    color = rateColor,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                )
+        item {
+            Card(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = stringResource(R.string.label_historical_trend),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.label_last_12_months),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
 
-                Spacer(modifier = Modifier.height(12.dp))
+                    if (isLoading) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
+                    } else if (historicalData.isNotEmpty()) {
+                        InterestRateChart(
+                            data = historicalData,
+                            color = rateColor,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                        )
 
-                // Chart legend
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    historicalData.firstOrNull()?.let { first ->
-                        Text(
-                            text = first.label,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    historicalData.lastOrNull()?.let { last ->
-                        Text(
-                            text = last.label,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+
+                        // Chart legend
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = historicalData.first().label,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = historicalData.last().label,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }
@@ -366,15 +422,15 @@ private fun InfoRow(label: String, value: String) {
 
 @Composable
 private fun InterestRateChart(
-    data: List<ChartDataPoint>,
+    data: List<HistoricalRate>,
     color: Color,
     modifier: Modifier = Modifier
 ) {
     if (data.isEmpty()) return
 
-    val minValue = data.minOf { it.value } - 0.5
-    val maxValue = data.maxOf { it.value } + 0.5
-    val range = maxValue - minValue
+    val minValue = (data.minOf { it.rate } - 0.5).coerceAtLeast(-1.0)
+    val maxValue = data.maxOf { it.rate } + 0.5
+    val range = (maxValue - minValue).coerceAtLeast(1.0)
 
     Canvas(modifier = modifier) {
         val width = size.width
@@ -398,8 +454,8 @@ private fun InterestRateChart(
             val path = Path()
             data.forEachIndexed { index, point ->
                 val x = index * stepX
-                val y = height - ((point.value - minValue) / range * height).toFloat()
-                
+                val y = height - ((point.rate - minValue) / range * height).toFloat()
+
                 if (index == 0) {
                     path.moveTo(x, y)
                 } else {
@@ -416,39 +472,19 @@ private fun InterestRateChart(
             // Draw points
             data.forEachIndexed { index, point ->
                 val x = index * stepX
-                val y = height - ((point.value - minValue) / range * height).toFloat()
-                
+                val y = height - ((point.rate - minValue) / range * height).toFloat()
+
                 drawCircle(
                     color = color,
-                    radius = 4.dp.toPx(),
+                    radius = 5.dp.toPx(),
                     center = Offset(x, y)
                 )
                 drawCircle(
                     color = Color.White,
-                    radius = 2.dp.toPx(),
+                    radius = 3.dp.toPx(),
                     center = Offset(x, y)
                 )
             }
         }
-    }
-}
-
-private data class ChartDataPoint(
-    val label: String,
-    val value: Double
-)
-
-private fun generateMockHistoricalData(currentRate: Double): List<ChartDataPoint> {
-    val months = listOf("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
-    val random = Random(currentRate.hashCode())
-    
-    return months.mapIndexed { index, month ->
-        val variation = (random.nextDouble() - 0.5) * 1.5
-        val progressToNow = index / 11.0
-        val value = currentRate - 1.0 + variation + progressToNow
-        ChartDataPoint(
-            label = month,
-            value = value.coerceIn(0.0, 20.0)
-        )
     }
 }
